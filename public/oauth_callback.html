@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OAuth Redirect Page</title>
+    <script>
+        // Questo script viene eseguito quando il pop-up viene reindirizzato al redirectUri
+        window.onload = function () {
+          // Estrai il parametro 'code' dall'URL
+          const params = new URLSearchParams(window.location.search);
+          const code = params.get("code");
+
+          if (code) {
+            // Invia il 'code' alla finestra principale utilizzando postMessage
+            window.opener.postMessage(window.location.href, window.location.origin);
+
+            // Chiudi il pop-up
+            window.close();
+          }
+        };
+    </script>
+</head>
+<body>
+<h1>Attendi qualche istante...</h1>
+</body>
+</html>
