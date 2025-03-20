@@ -26,6 +26,8 @@ const RESOURCES = {"assets/AssetManifest.bin": "40bfb9d5668cdd8df8a4440628650ad6
 "assets/assets/images/topographic_background.jpg": "9d0e516e26767079458a90987b481e7b",
 "assets/FontManifest.json": "cd91baeac20d355447b636a1143f4c26",
 "assets/fonts/MaterialIcons-Regular.otf": "34321aaf71cb0a23259e71bf7ef51844",
+"assets/images/topographic_background.jpg": "9d0e516e26767079458a90987b481e7b",
+"assets/images/topographic_background_orange.jpg": "f374b75fd3de7065efd07114b04da0c0",
 "assets/NOTICES": "3cfd2aac03a201449c7f7c7a42404f69",
 "assets/packages/awesome_snackbar_content/assets/back.svg": "ba1c3aebba280f23f5509bd42dab958d",
 "assets/packages/awesome_snackbar_content/assets/bubbles.svg": "1df6817bf509ee4e615fe821bc6dabd9",
