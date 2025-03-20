@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:oservice/db/firebaseHelper.dart';
 import 'package:oservice/entities/collaborator.dart';
+import 'package:oservice/entities/taxinfo.dart';
 import 'package:oservice/enums/menu.dart';
 import 'package:oservice/utils/responseHandler.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
@@ -24,6 +25,28 @@ class CollaboratorCardAction extends StatefulWidget {
 }
 
 class _CollaboratorCardActionState extends State<CollaboratorCardAction> {
+  bool areTaxIndoComplete = false;
+
+  @override
+  void initState() {
+    super.initState();
+    checkTaxInfo();
+  }
+
+  Future<void> checkTaxInfo() async {
+    TaxInfo? taxInfo = await FirebaseHelper.getTaxInfoByCollaboratorId(widget.collaborator.id);
+    if (taxInfo == null) {
+      setState(() {
+        areTaxIndoComplete = false;
+      });
+    }
+    else {
+      setState(() {
+        areTaxIndoComplete = true;
+      });
+    }
+  }
+
   void showSuccessSnackbar(String title) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -69,6 +92,7 @@ class _CollaboratorCardActionState extends State<CollaboratorCardAction> {
             ),
             TextButton(
               onPressed: () async {
+                Navigator.of(context).pop();
                 Result<String> result =
                 await FirebaseHelper.deleteCollaborator(widget.collaborator.id);
                 if (result is Success) {
@@ -94,6 +118,18 @@ class _CollaboratorCardActionState extends State<CollaboratorCardAction> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
+        areTaxIndoComplete ? Container() : Tooltip(
+          message: "Aggiungi informazioni di fatturazione",
+          child: IconButton(
+            icon: Icon(Icons.recent_actors_rounded, color: Theme.of(context).primaryColorLight),
+            onPressed: () async {
+              await FirebaseHelper.setIdSavedTaxInfo(widget.collaborator.id);
+              widget.changeTab(Menu.TAX_INFO.index);
+              Menu.screenRouting(
+                  Menu.TAX_INFO.index, widget.changeTab, widget.menu);
+            },
+          ),
+        ),
         IconButton(
           icon: Icon(Icons.edit, color: Theme.of(context).primaryColorLight),
           onPressed: () async {

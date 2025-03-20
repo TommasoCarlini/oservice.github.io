@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:oservice/db/firebaseHelper.dart';
 import 'package:oservice/entities/collaborator.dart';
 import 'package:oservice/entities/collaboratorExtended.dart';
+import 'package:oservice/entities/taxinfo.dart';
 import 'package:oservice/enums/menu.dart';
 import 'package:oservice/utils/responseHandler.dart';
 
@@ -27,9 +28,12 @@ class _AddCollaboratorScreenState extends State<AddCollaboratorScreen> {
   final TextEditingController phoneController = TextEditingController();
   bool englishSpeakerController = false;
 
+  bool areTaxIndoComplete = false;
+
   FirebaseHelper firebaseHelper = FirebaseHelper.initialize();
 
   bool isEditMode = false;
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -39,13 +43,28 @@ class _AddCollaboratorScreenState extends State<AddCollaboratorScreen> {
 
   Future<void> _fetchSavedCollaborator() async {
     try {
-      String savedCollaboratorId = await FirebaseHelper.getIdSavedCollaborator();
-      Collaborator savedCollaborator = await FirebaseHelper.getCollaboratorById(savedCollaboratorId);
+      String savedCollaboratorId =
+          await FirebaseHelper.getIdSavedCollaborator();
+      Collaborator savedCollaborator =
+          await FirebaseHelper.getCollaboratorById(savedCollaboratorId);
+      checkTaxInfo(savedCollaborator.id);
       populateFields(savedCollaborator);
-
     } catch (e) {
       showErrorSnackbar(
           Exception('Errore durante il recupero del collaboratore: $e'));
+    }
+  }
+
+  Future<void> checkTaxInfo(id) async {
+    TaxInfo? taxInfo = await FirebaseHelper.getTaxInfoByCollaboratorId(id);
+    if (taxInfo == null) {
+      setState(() {
+        areTaxIndoComplete = false;
+      });
+    } else {
+      setState(() {
+        areTaxIndoComplete = true;
+      });
     }
   }
 
@@ -54,6 +73,9 @@ class _AddCollaboratorScreenState extends State<AddCollaboratorScreen> {
     setState(() {
       if (isEditMode) {
         _fetchSavedCollaborator();
+      }
+      else {
+        isLoading = false;
       }
       this.isEditMode = isEditMode;
     });
@@ -66,17 +88,16 @@ class _AddCollaboratorScreenState extends State<AddCollaboratorScreen> {
       mailController.text = savedCollaborator.mail;
       phoneController.text = savedCollaborator.phone;
       englishSpeakerController = savedCollaborator.englishSpeaker;
+      isLoading = false;
     });
   }
 
   void changeScreen() {
     if (Menu.fromIndex(widget.menu.index) == Menu.COLLABORATORI) {
       widget.changeTab(Menu.COLLABORATORI.index);
-    }
-    else if (Menu.fromIndex(widget.menu.index) == Menu.HOME) {
+    } else if (Menu.fromIndex(widget.menu.index) == Menu.HOME) {
       widget.changeTab(Menu.AGGIUNGI_LEZIONE.index);
-    }
-    else {
+    } else {
       widget.changeTab(Menu.IMPOSTAZIONI.index);
     }
   }
@@ -107,11 +128,12 @@ class _AddCollaboratorScreenState extends State<AddCollaboratorScreen> {
     );
   }
 
-  Future<void> addCollaborator() async {
+  Future<void> addTaxInfo() async {
     final String name = nameController.text;
     final String mail = mailController.text;
     final String phone = phoneController.text;
-    final String nickname = nicknameController.text.isEmpty ? name : nicknameController.text;
+    final String nickname =
+        nicknameController.text.isEmpty ? name : nicknameController.text;
 
     CollaboratorExtended collaborator = CollaboratorExtended(
       name: name,
@@ -121,8 +143,40 @@ class _AddCollaboratorScreenState extends State<AddCollaboratorScreen> {
       englishSpeaker: englishSpeakerController,
       payments: [],
       availabilities: [],
-    )..nickname = nickname
-    ..lessons = [];
+    )
+      ..nickname = nickname
+      ..lessons = [];
+
+    Result<String> result = await firebaseHelper.addCollaborator(collaborator);
+
+    if (result is Success) {
+      showSuccessSnackbar(name);
+      await FirebaseHelper.setIsCollaboratorSaved(false);
+      await FirebaseHelper.setIdSavedTaxInfo((result as Success).data);
+      widget.changeTab(Menu.TAX_INFO.index);
+    } else {
+      showErrorSnackbar((result as Error).exception);
+    }
+  }
+
+  Future<void> addCollaborator() async {
+    final String name = nameController.text;
+    final String mail = mailController.text;
+    final String phone = phoneController.text;
+    final String nickname =
+        nicknameController.text.isEmpty ? name : nicknameController.text;
+
+    CollaboratorExtended collaborator = CollaboratorExtended(
+      name: name,
+      mail: mail.toLowerCase(),
+      phone: phone,
+      nickname: nickname,
+      englishSpeaker: englishSpeakerController,
+      payments: [],
+      availabilities: [],
+    )
+      ..nickname = nickname
+      ..lessons = [];
 
     Result<String> result = await firebaseHelper.addCollaborator(collaborator);
 
@@ -167,6 +221,12 @@ class _AddCollaboratorScreenState extends State<AddCollaboratorScreen> {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
 
+    if (isLoading) {
+      return Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
     return Card(
       shape: ContinuousRectangleBorder(
         borderRadius: BorderRadius.circular(160),
@@ -205,7 +265,8 @@ class _AddCollaboratorScreenState extends State<AddCollaboratorScreen> {
                     child: TextFormField(
                       controller: nicknameController,
                       decoration: InputDecoration(
-                        labelText: 'Nome da visualizzare (se vuoto, verrà usato il nome)',
+                        labelText:
+                            'Nome da visualizzare (se vuoto, verrà usato il nome)',
                         border: UnderlineInputBorder(),
                       ),
                     ),
@@ -242,7 +303,10 @@ class _AddCollaboratorScreenState extends State<AddCollaboratorScreen> {
               SizedBox(height: 40),
               Row(
                 children: [
-                  Text("Può fare lezione in inglese?", style: TextStyle(fontSize: 16),),
+                  Text(
+                    "Può fare lezione in inglese?",
+                    style: TextStyle(fontSize: 16),
+                  ),
                   SizedBox(width: 10),
                   Checkbox(
                     value: englishSpeakerController,
@@ -263,7 +327,8 @@ class _AddCollaboratorScreenState extends State<AddCollaboratorScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red.shade700,
                         surfaceTintColor: Colors.blue.shade900,
-                        padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
@@ -280,11 +345,34 @@ class _AddCollaboratorScreenState extends State<AddCollaboratorScreen> {
                       ),
                     ),
                     SizedBox(width: 20),
+                    areTaxIndoComplete
+                        ? SizedBox()
+                        : ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green.shade700,
+                              textStyle: TextStyle(color: Colors.white),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 32, vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                            onPressed: addTaxInfo,
+                            child: Text(
+                              'Aggiungi informazioni di fatturazione',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'Montserrat',
+                                  color: Colors.white),
+                            ),
+                          ),
+                    SizedBox(width: 20),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green.shade700,
                         textStyle: TextStyle(color: Colors.white),
-                        padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),

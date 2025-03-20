@@ -26,7 +26,7 @@ class DateRowWidget extends StatelessWidget {
       DateTime? pickedStartDate = await showDatePicker(
         builder: (BuildContext context, Widget? child) {
           return Theme(
-              data: ThemeData.light().copyWith(
+              data: ThemeData.dark().copyWith(
                 colorScheme: ColorScheme.light(
                   primary: Colors.deepOrangeAccent,
                   onSurface: Colors.black87,

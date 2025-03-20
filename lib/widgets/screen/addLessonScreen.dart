@@ -164,7 +164,6 @@ class _AddLessonScreenState extends State<AddLessonScreen> {
   Future<void> _fetchEditingLesson() async {
     try {
       String savedLessonId = await FirebaseHelper.getIdSavedLesson();
-      print(savedLessonId);
       Lesson savedLesson = await FirebaseHelper.getLessonById(savedLessonId);
       populateFields(savedLesson);
     } catch (e) {
@@ -211,6 +210,8 @@ class _AddLessonScreenState extends State<AddLessonScreen> {
   }
 
   Future<void> addLesson() async {
+    print(startDate);
+    print(endDate);
     Lesson newLesson = Lesson(
       title: titleController.text,
       description: notesController.text,
@@ -275,14 +276,17 @@ class _AddLessonScreenState extends State<AddLessonScreen> {
       isLoading = true;
     });
 
-    Lesson savedLesson = await FirebaseHelper.getLessonById(await FirebaseHelper.getIdSavedLesson());
+    Lesson savedLesson = await FirebaseHelper.getLessonById(
+        await FirebaseHelper.getIdSavedLesson());
     CalendarApi.Event event = await newLesson.mapToEvent()
       ..id = savedLesson.eventId;
 
     Result<String> calendarApiResult;
     if (newLesson.entity.id != savedLesson.entity.id) {
-      calendarApiResult = await CalendarClient.deleteEvent(savedLesson.entity.calendarId, savedLesson.eventId!);
-      calendarApiResult = await CalendarClient.addEvent(event, newLesson.entity.calendarId);
+      calendarApiResult = await CalendarClient.deleteEvent(
+          savedLesson.entity.calendarId, savedLesson.eventId!);
+      calendarApiResult =
+          await CalendarClient.addEvent(event, newLesson.entity.calendarId);
     } else {
       calendarApiResult = await CalendarClient.updateEvent(
           event, newLesson.entity.calendarId, event.id!);
@@ -477,439 +481,420 @@ class _AddLessonScreenState extends State<AddLessonScreen> {
     }
 
     return Card(
-            shape: ContinuousRectangleBorder(
-              borderRadius: BorderRadius.circular(160),
-            ),
-            color: Colors.white.withOpacity(0.9),
-            child: Padding(
-              padding: const EdgeInsets.all(36.0),
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Text(
-                      "Aggiungi una nuova lezione",
-                      style: Theme.of(context).primaryTextTheme.titleMedium,
-                    ),
-                    SizedBox(height: 20),
+      shape: ContinuousRectangleBorder(
+        borderRadius: BorderRadius.circular(160),
+      ),
+      color: Colors.white.withOpacity(0.9),
+      child: Padding(
+        padding: const EdgeInsets.all(36.0),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Text(
+                "Aggiungi una nuova lezione",
+                style: Theme.of(context).primaryTextTheme.titleMedium,
+              ),
+              SizedBox(height: 20),
 
-                    // TITLE, ENTITY, LOCATION
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextFormField(
-                            controller: titleController,
-                            decoration: InputDecoration(
-                              labelText: 'Titolo',
-                              border: UnderlineInputBorder(),
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 40),
-                        IconButton(
-                            onPressed: () {
-                              widget.changeTab(Menu.AGGIUNGI_ENTE.index);
-                            },
-                            icon: Icon(Icons.add_home_work_rounded)),
-                        EntityDropdown(
-                            controller: entityController,
-                            filteredEntities: filteredEntities,
-                            onSelected: (Entity? entity) {
-                              setState(() {
-                                selectedEntity = entity;
-                              });
-                            }),
-                        SizedBox(width: 40),
-                        IconButton(
-                            onPressed: () {
-                              widget.changeTab(Menu.AGGIUNGI_LOCATION.index);
-                            },
-                            icon: Icon(Icons.add_location_alt_rounded)),
-                        LocationDropdown(
-                          controller: locationController,
-                          filteredLocations: filteredLocations,
-                          onSelected: (Location? location) {
-                            setState(() {
-                              selectedLocation = location;
-                            });
-                          },
-                        ),
-                        SizedBox(width: 20),
-                      ],
-                    ),
-                    SizedBox(height: 20),
-
-                    // DATES
-                    Row(
-                      children: [
-                        Text('Numero di partecipanti: ',
-                            style:
-                                Theme.of(context).primaryTextTheme.labelMedium),
-                        SizedBox(
-                          width: 40,
-                          child: TextFormField(
-                            controller: participantsController,
-                            style:
-                                Theme.of(context).primaryTextTheme.labelMedium,
-                            decoration: InputDecoration(
-                              border: UnderlineInputBorder(),
-                            ),
-                            onChanged: (String value) {
-                              setState(() {});
-                            },
-                          ),
-                        ),
-                        SizedBox(width: 50),
-                        SizedBox(
-                          width: 250,
-                          child: CheckboxListTile(
-                            title: Text('Campo scuola',
-                                style: Theme.of(context)
-                                    .primaryTextTheme
-                                    .labelMedium),
-                            value: schoolCampController,
-                            controlAffinity: ListTileControlAffinity.leading,
-                            contentPadding:
-                                EdgeInsets.symmetric(horizontal: 10),
-                            onChanged: (bool? value) {
-                              setState(() {
-                                schoolCampController = value!;
-                                if (schoolCampController) {
-                                  startDate = DateTime(startDate.year,
-                                      startDate.month, startDate.day, 10, 00);
-                                  endDate = startDate
-                                      .add(Duration(days: 2))
-                                      .add(Duration(hours: 8));
-                                } else {
-                                  endDate = startDate.add(Duration(hours: 4));
-                                }
-                              });
-                            },
-                          ),
-                        ),
-                        SizedBox(width: 20),
-                        DateRowWidget(
-                          isSchoolCamp: schoolCampController,
-                          startDate: startDate,
-                          endDate: endDate,
-                          onStartDateChanged: (DateTime date) {
-                            setState(() {
-                              startDate = date
-                                  .add(Duration(hours: startDate.hour))
-                                  .add(Duration(minutes: startDate.minute));
-                              if (schoolCampController) {
-                                startDate = DateTime(startDate.year,
-                                    startDate.month, startDate.day, 10, 00);
-                                endDate = date
-                                    .add(Duration(days: 2))
-                                    .add(Duration(hours: 8));
-                              } else {
-                                endDate = date
-                                    .add(Duration(hours: endDate.hour))
-                                    .add(Duration(minutes: endDate.minute));
-                              }
-                            });
-                          },
-                          onEndDateChanged: (DateTime date) {
-                            setState(() {
-                              endDate = date;
-                            });
-                          },
-                          onTimeChanged: (TimeRange pickedTime) {
-                            setState(() {
-                              startDate = DateTime(
-                                  startDate.year,
-                                  startDate.month,
-                                  startDate.day,
-                                  pickedTime.startTime.hour,
-                                  pickedTime.startTime.minute);
-                              endDate = DateTime(
-                                  endDate.year,
-                                  endDate.month,
-                                  endDate.day,
-                                  pickedTime.endTime.hour,
-                                  pickedTime.endTime.minute);
-                            });
-                          },
-                        ),
-                        SizedBox(width: 20),
-                      ],
-                    ),
-
-                    // COLLABORATORS
-                    Row(
-                      children: [
-                        Text('Collaboratori necessari: ',
-                            style:
-                                Theme.of(context).primaryTextTheme.labelMedium),
-                        SizedBox(
-                          width: 25,
-                          child: TextFormField(
-                            controller: collaboratorsNeededController,
-                            style:
-                                Theme.of(context).primaryTextTheme.labelMedium,
-                            decoration: InputDecoration(
-                              border: UnderlineInputBorder(),
-                            ),
-                            onChanged: (String value) {
-                              setState(() {});
-                            },
-                          ),
-                        ),
-                        SizedBox(width: 69),
-                        SizedBox(
-                          width: 300,
-                          child: CheckboxListTile(
-                            title: Text('Devono parlare inglese',
-                                style: Theme.of(context)
-                                    .primaryTextTheme
-                                    .labelMedium),
-                            value: englishSpeakerController,
-                            controlAffinity: ListTileControlAffinity.leading,
-                            contentPadding:
-                                EdgeInsets.symmetric(horizontal: 10),
-                            onChanged: (bool? value) {
-                              setState(() {
-                                englishSpeakerController = value!;
-                              });
-                            },
-                          ),
-                        ),
-                        EnglishWarningIcon(
-                          englishLesson: englishSpeakerController,
-                          chosenCollaborators: chosenCollaborators,
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Tooltip(
-                          verticalOffset: -40,
-                          message: chosenCollaborators.map((collaborator) {
-                            return collaborator.name;
-                          }).join(', '),
-                          decoration: BoxDecoration(
-                            color: Colors.black,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          textStyle:
-                              Theme.of(context).primaryTextTheme.labelSmall,
-                          child: Text(
-                              'Collaboratori: ${chosenCollaborators.length} su ${collaboratorsNeededController.text.isEmpty ? 0 : collaboratorsNeededController.text}',
-                              style: Theme.of(context)
-                                  .primaryTextTheme
-                                  .labelMedium),
-                        ),
-                        SizedBox(width: 20),
-                        IconButton(
-                            onPressed: () {
-                              setState(() {
-                                showCollaborators = !showCollaborators;
-                              });
-                            },
-                            icon: showCollaborators
-                                ? Icon(
-                                    Icons.visibility_rounded,
-                                    size: 18,
-                                    color: Theme.of(context).primaryColorLight,
-                                  )
-                                : Icon(
-                                    Icons.visibility_off_rounded,
-                                    size: 18,
-                                    color: Theme.of(context).primaryColorLight,
-                                  )),
-                        SizedBox(width: 10),
-                        Text(
-                            showCollaborators
-                                ? chosenCollaborators.map((collaborator) {
-                                    return collaborator.name;
-                                  }).join(', ')
-                                : '',
-                            style:
-                                Theme.of(context).primaryTextTheme.labelMedium),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        IconButton(
-                            onPressed: () {
-                              widget
-                                  .changeTab(Menu.AGGIUNGI_COLLABORATORE.index);
-                            },
-                            icon: Icon(Icons.person_add_alt_1_rounded)),
-                        CollaboratorDropdown(
-                          controller: collaboratorsController,
-                          filteredCollaborators: allCollaborators,
-                          chosenCollaborators: chosenCollaborators,
-                          englishLesson: englishSpeakerController,
-                          onSelected: (Collaborator? collaborator) {
-                            setState(() {
-                              if (collaborator != null) {
-                                if (isCollaboratorInList(collaborator)) {
-                                  chosenCollaborators.removeWhere((element) =>
-                                      element.name == collaborator.name);
-                                  if (responsibleCollaborator.text ==
-                                      collaborator.name) {
-                                    responsibleCollaborator.clear();
-                                    selectedResponsible = null;
-                                  }
-                                } else {
-                                  chosenCollaborators.add(collaborator);
-                                }
-                                collaboratorsController.clear();
-                                if (isCollaboratorInList(collaborator)) {
-                                  showSuccessAddCollaboratorSnackbar(
-                                      collaborator.name);
-                                } else {
-                                  showSuccessRemoveCollaboratorSnackbar(
-                                      collaborator.name);
-                                }
-                              }
-                            });
-                          },
-                        ),
-                        SizedBox(width: 20),
-                        DropdownMenu<Collaborator>(
-                          width: 400,
-                          label: Text('Responsabile'),
-                          inputDecorationTheme: InputDecorationTheme(
-                            border: UnderlineInputBorder(),
-                          ),
-                          hintText: 'Seleziona il responsabile',
-                          controller: responsibleCollaborator,
-                          enableFilter: true,
-                          dropdownMenuEntries:
-                              chosenCollaborators.map((collaborator) {
-                            return DropdownMenuEntry<Collaborator>(
-                              value: collaborator,
-                              label: collaborator.name,
-                            );
-                          }).toList(),
-                          onSelected: (Collaborator? collaborator) {
-                            if (collaborator != null) {
-                              setState(() {
-                                responsibleCollaborator.text =
-                                    collaborator.name;
-                                selectedResponsible = collaborator;
-                              });
-                            }
-                          },
-                        ),
-                        Spacer(),
-                      ],
-                    ),
-                    SizedBox(height: 20),
-
-                    // EXERCISES
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                            chosenExercises.isEmpty
-                                ? 'Nessun esercizio selezionato'
-                                : 'Esercizi:  ${chosenExercises.map((exercise) {
-                                    return exercise.title;
-                                  }).join(', ')}',
-                            style:
-                                Theme.of(context).primaryTextTheme.labelMedium),
-                      ],
-                    ),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                            onPressed: () {
-                              widget.changeTab(Menu.AGGIUNGI_ESERCIZIO.index);
-                            },
-                            icon: Icon(Icons.add_chart_rounded)),
-                        ExerciseDropdown(
-                          controller: exerciseController,
-                          filteredExercises: allExercises,
-                          chosenExercises: chosenExercises,
-                          onSelected: (Exercise? exercise) {
-                            setState(() {
-                              if (exercise != null) {
-                                if (isExerciseInList(exercise)) {
-                                  chosenExercises.removeWhere((element) =>
-                                      element.title == exercise.title);
-                                } else {
-                                  chosenExercises.add(exercise);
-                                }
-                                exerciseController.clear();
-                              }
-                            });
-                          },
-                        ),
-                        SizedBox(width: 20),
-                      ],
-                    ),
-
-                    // NOTES
-                    TextFormField(
-                      controller: notesController,
+              // TITLE, ENTITY, LOCATION
+              Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      controller: titleController,
                       decoration: InputDecoration(
-                        labelText: 'Note',
+                        labelText: 'Titolo',
                         border: UnderlineInputBorder(),
                       ),
-                      maxLines: 2,
                     ),
-                    SizedBox(height: 20),
+                  ),
+                  SizedBox(width: 40),
+                  IconButton(
+                      onPressed: () {
+                        widget.changeTab(Menu.AGGIUNGI_ENTE.index);
+                      },
+                      icon: Icon(Icons.add_home_work_rounded)),
+                  EntityDropdown(
+                      controller: entityController,
+                      filteredEntities: filteredEntities,
+                      onSelected: (Entity? entity) {
+                        setState(() {
+                          selectedEntity = entity;
+                        });
+                      }),
+                  SizedBox(width: 40),
+                  IconButton(
+                      onPressed: () {
+                        widget.changeTab(Menu.AGGIUNGI_LOCATION.index);
+                      },
+                      icon: Icon(Icons.add_location_alt_rounded)),
+                  LocationDropdown(
+                    controller: locationController,
+                    filteredLocations: filteredLocations,
+                    onSelected: (Location? location) {
+                      setState(() {
+                        selectedLocation = location;
+                      });
+                    },
+                  ),
+                  SizedBox(width: 20),
+                ],
+              ),
+              SizedBox(height: 20),
 
-                    Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red.shade700,
-                              surfaceTintColor: Colors.blue.shade900,
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 32, vertical: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                            ),
-                            onPressed: () {
-                              showConfirmDialog();
-                            },
-                            child: Text(
-                              'Annulla',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  fontFamily: 'Montserrat'),
-                            ),
-                          ),
-                          SizedBox(width: 20),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green.shade700,
-                              textStyle: TextStyle(color: Colors.white),
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 32, vertical: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                            ),
-                            onPressed: () {
-                              isEditMode ? updateLesson() : addLesson();
-                            },
-                            child: Text(
-                              isEditMode
-                                  ? "Salva le modifiche"
-                                  : "Aggiungi lezione",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: 'Montserrat',
-                                  color: Colors.white),
-                            ),
-                          ),
-                        ],
+              // DATES
+              Row(
+                children: [
+                  Text('Numero di partecipanti: ',
+                      style: Theme.of(context).primaryTextTheme.labelMedium),
+                  SizedBox(
+                    width: 40,
+                    child: TextFormField(
+                      controller: participantsController,
+                      style: Theme.of(context).primaryTextTheme.labelMedium,
+                      decoration: InputDecoration(
+                        border: UnderlineInputBorder(),
+                      ),
+                      onChanged: (String value) {
+                        setState(() {});
+                      },
+                    ),
+                  ),
+                  SizedBox(width: 50),
+                  SizedBox(
+                    width: 250,
+                    child: CheckboxListTile(
+                      title: Text('Campo scuola',
+                          style:
+                              Theme.of(context).primaryTextTheme.labelMedium),
+                      value: schoolCampController,
+                      controlAffinity: ListTileControlAffinity.leading,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                      onChanged: (bool? value) {
+                        setState(() {
+                          schoolCampController = value!;
+                          if (schoolCampController) {
+                            startDate = DateTime(startDate.year,
+                                startDate.month, startDate.day, 10, 00);
+                            endDate =
+                                startDate.add(Duration(days: 2, hours: 8));
+                          } else {
+                            endDate = startDate.add(Duration(hours: 4));
+                          }
+                        });
+                      },
+                    ),
+                  ),
+                  SizedBox(width: 20),
+                  DateRowWidget(
+                    isSchoolCamp: schoolCampController,
+                    startDate: startDate,
+                    endDate: endDate,
+                    onStartDateChanged: (DateTime date) {
+                      setState(() {
+                        startDate = date
+                            .add(Duration(hours: startDate.hour, minutes: startDate.minute));
+                        if (schoolCampController) {
+                          startDate = DateTime(startDate.year, startDate.month,
+                              startDate.day, 10, 00);
+                          endDate = date.add(Duration(days: 2, hours: 8));
+                        } else {
+                          endDate = date.add(Duration(
+                              hours: endDate.hour, minutes: endDate.minute));
+                        }
+                      });
+                    },
+                    onEndDateChanged: (DateTime date) {
+                      setState(() {
+                        endDate = date;
+                        if (schoolCampController) {
+                          endDate = date.add(Duration(hours: 18));
+                        }
+                      });
+                    },
+                    onTimeChanged: (TimeRange pickedTime) {
+                      setState(() {
+                        startDate = DateTime(
+                            startDate.year,
+                            startDate.month,
+                            startDate.day,
+                            pickedTime.startTime.hour,
+                            pickedTime.startTime.minute);
+                        endDate = DateTime(
+                            endDate.year,
+                            endDate.month,
+                            endDate.day,
+                            pickedTime.endTime.hour,
+                            pickedTime.endTime.minute);
+                      });
+                    },
+                  ),
+                  SizedBox(width: 20),
+                ],
+              ),
+
+              // COLLABORATORS
+              Row(
+                children: [
+                  Text('Collaboratori necessari: ',
+                      style: Theme.of(context).primaryTextTheme.labelMedium),
+                  SizedBox(
+                    width: 25,
+                    child: TextFormField(
+                      controller: collaboratorsNeededController,
+                      style: Theme.of(context).primaryTextTheme.labelMedium,
+                      decoration: InputDecoration(
+                        border: UnderlineInputBorder(),
+                      ),
+                      onChanged: (String value) {
+                        setState(() {});
+                      },
+                    ),
+                  ),
+                  SizedBox(width: 69),
+                  SizedBox(
+                    width: 300,
+                    child: CheckboxListTile(
+                      title: Text('Devono parlare inglese',
+                          style:
+                              Theme.of(context).primaryTextTheme.labelMedium),
+                      value: englishSpeakerController,
+                      controlAffinity: ListTileControlAffinity.leading,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                      onChanged: (bool? value) {
+                        setState(() {
+                          englishSpeakerController = value!;
+                        });
+                      },
+                    ),
+                  ),
+                  EnglishWarningIcon(
+                    englishLesson: englishSpeakerController,
+                    chosenCollaborators: chosenCollaborators,
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Tooltip(
+                    verticalOffset: -40,
+                    message: chosenCollaborators.map((collaborator) {
+                      return collaborator.name;
+                    }).join(', '),
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    textStyle: Theme.of(context).primaryTextTheme.labelSmall,
+                    child: Text(
+                        'Collaboratori: ${chosenCollaborators.length} su ${collaboratorsNeededController.text.isEmpty ? 0 : collaboratorsNeededController.text}',
+                        style: Theme.of(context).primaryTextTheme.labelMedium),
+                  ),
+                  SizedBox(width: 20),
+                  IconButton(
+                      onPressed: () {
+                        setState(() {
+                          showCollaborators = !showCollaborators;
+                        });
+                      },
+                      icon: showCollaborators
+                          ? Icon(
+                              Icons.visibility_rounded,
+                              size: 18,
+                              color: Theme.of(context).primaryColorLight,
+                            )
+                          : Icon(
+                              Icons.visibility_off_rounded,
+                              size: 18,
+                              color: Theme.of(context).primaryColorLight,
+                            )),
+                  SizedBox(width: 10),
+                  Text(
+                      showCollaborators
+                          ? chosenCollaborators.map((collaborator) {
+                              return collaborator.name;
+                            }).join(', ')
+                          : '',
+                      style: Theme.of(context).primaryTextTheme.labelMedium),
+                ],
+              ),
+              Row(
+                children: [
+                  IconButton(
+                      onPressed: () {
+                        widget.changeTab(Menu.AGGIUNGI_COLLABORATORE.index);
+                      },
+                      icon: Icon(Icons.person_add_alt_1_rounded)),
+                  CollaboratorDropdown(
+                    controller: collaboratorsController,
+                    filteredCollaborators: allCollaborators,
+                    chosenCollaborators: chosenCollaborators,
+                    englishLesson: englishSpeakerController,
+                    onSelected: (Collaborator? collaborator) {
+                      setState(() {
+                        if (collaborator != null) {
+                          if (isCollaboratorInList(collaborator)) {
+                            chosenCollaborators.removeWhere(
+                                (element) => element.name == collaborator.name);
+                            if (responsibleCollaborator.text ==
+                                collaborator.name) {
+                              responsibleCollaborator.clear();
+                              selectedResponsible = null;
+                            }
+                          } else {
+                            chosenCollaborators.add(collaborator);
+                          }
+                          collaboratorsController.clear();
+                          if (isCollaboratorInList(collaborator)) {
+                            showSuccessAddCollaboratorSnackbar(
+                                collaborator.name);
+                          } else {
+                            showSuccessRemoveCollaboratorSnackbar(
+                                collaborator.name);
+                          }
+                        }
+                      });
+                    },
+                  ),
+                  SizedBox(width: 20),
+                  DropdownMenu<Collaborator>(
+                    width: 400,
+                    label: Text('Responsabile'),
+                    inputDecorationTheme: InputDecorationTheme(
+                      border: UnderlineInputBorder(),
+                    ),
+                    hintText: 'Seleziona il responsabile',
+                    controller: responsibleCollaborator,
+                    enableFilter: true,
+                    dropdownMenuEntries:
+                        chosenCollaborators.map((collaborator) {
+                      return DropdownMenuEntry<Collaborator>(
+                        value: collaborator,
+                        label: collaborator.name,
+                      );
+                    }).toList(),
+                    onSelected: (Collaborator? collaborator) {
+                      if (collaborator != null) {
+                        setState(() {
+                          responsibleCollaborator.text = collaborator.name;
+                          selectedResponsible = collaborator;
+                        });
+                      }
+                    },
+                  ),
+                  Spacer(),
+                ],
+              ),
+              SizedBox(height: 20),
+
+              // EXERCISES
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                      chosenExercises.isEmpty
+                          ? 'Nessun esercizio selezionato'
+                          : 'Esercizi:  ${chosenExercises.map((exercise) {
+                              return exercise.title;
+                            }).join(', ')}',
+                      style: Theme.of(context).primaryTextTheme.labelMedium),
+                ],
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                      onPressed: () {
+                        widget.changeTab(Menu.AGGIUNGI_ESERCIZIO.index);
+                      },
+                      icon: Icon(Icons.add_chart_rounded)),
+                  ExerciseDropdown(
+                    controller: exerciseController,
+                    filteredExercises: allExercises,
+                    chosenExercises: chosenExercises,
+                    onSelected: (Exercise? exercise) {
+                      setState(() {
+                        if (exercise != null) {
+                          if (isExerciseInList(exercise)) {
+                            chosenExercises.removeWhere(
+                                (element) => element.title == exercise.title);
+                          } else {
+                            chosenExercises.add(exercise);
+                          }
+                          exerciseController.clear();
+                        }
+                      });
+                    },
+                  ),
+                  SizedBox(width: 20),
+                ],
+              ),
+
+              // NOTES
+              TextFormField(
+                controller: notesController,
+                decoration: InputDecoration(
+                  labelText: 'Note',
+                  border: UnderlineInputBorder(),
+                ),
+                maxLines: 2,
+              ),
+              SizedBox(height: 20),
+
+              Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red.shade700,
+                        surfaceTintColor: Colors.blue.shade900,
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      onPressed: () {
+                        showConfirmDialog();
+                      },
+                      child: Text(
+                        'Annulla',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontFamily: 'Montserrat'),
+                      ),
+                    ),
+                    SizedBox(width: 20),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green.shade700,
+                        textStyle: TextStyle(color: Colors.white),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      onPressed: () {
+                        isEditMode ? updateLesson() : addLesson();
+                      },
+                      child: Text(
+                        isEditMode ? "Salva le modifiche" : "Aggiungi lezione",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Montserrat',
+                            color: Colors.white),
                       ),
                     ),
                   ],
                 ),
               ),
-            ),
-          );
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

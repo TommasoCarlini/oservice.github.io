@@ -88,7 +88,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             TextButton(
               onPressed: () async {
                 Navigator.of(context).pop();
-                widget.changeTab(Menu.LEZIONI_NON_CONVALIDATE.index);
+                widget.changeTab(Menu.IMPOSTAZIONI.index);
                 Menu.screenRouting(Menu.LEZIONI_NON_CONVALIDATE.index, widget.changeTab, widget.menu);
               },
               child: Text(
@@ -175,19 +175,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       if (payrateController.text.isEmpty) {
         return 0;
       }
-      if (evaluateDuration() > 60 * 24) {
-        return double.parse(payrateController.text) * evaluateDuration() / (60 * 24);
-      }
-      return double.parse(payrateController.text) * evaluateDuration() / 60;
-    }
-
-    double evaluatePayrateCollaborator() {
-      return evaluatePayrateTotal() / lesson.collaborators.length;
+      return double.parse(payrateController.text) * collaboratorControllers.length;
     }
 
     void applyDefaultPayrateToEveryone() {
       for (var controller in collaboratorControllers) {
-        controller.text = evaluatePayrateTotal.toString();
+        controller.text = payrateController.text;
       }
     }
 
@@ -284,206 +277,208 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       color: Colors.white.withOpacity(0.9),
       child: Padding(
         padding: const EdgeInsets.all(18.0),
-        child: Column(
-          children: [
-            Text(
-              "Registra la lezione",
-              style: Theme.of(context).primaryTextTheme.titleMedium,
-            ),
-            SizedBox(height: 30),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "${titleText()}, ${participantsText()} ${collaboratorsText()}.\n${timingText()}.\n${locationText()}",
-                      style: TextStyle(
-                        color: Theme.of(context).primaryColorLight,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Text(
+                "Registra la lezione",
+                style: Theme.of(context).primaryTextTheme.titleMedium,
+              ),
+              SizedBox(height: 30),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "${titleText()}, ${participantsText()} ${collaboratorsText()}.\n${timingText()}.\n${locationText()}",
+                        style: TextStyle(
+                          color: Theme.of(context).primaryColorLight,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 10),
-                  ],
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Text(
-                  "Supponendo una paga di ",
-                  style: TextStyle(
-                    color: Theme.of(context).primaryColorLight,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                      SizedBox(height: 10),
+                    ],
                   ),
-                ),
-                SizedBox(
-                  width: 24,
-                  child: TextFormField(
-                    controller: payrateController,
-                    decoration: InputDecoration(
-                      border: UnderlineInputBorder(),
-                    ),
-                    onChanged: (value) {
-                      setState(() {
-                        if (applyDefaultPayrate) {
-                          applyDefaultPayrateToEveryone();
-                        }
-                      });
-                    },
+                ],
+              ),
+              Row(
+                children: [
+                  Text(
+                    "Supponendo una paga di ",
                     style: TextStyle(
                       color: Theme.of(context).primaryColorLight,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                ),
-                Text(
-                  "€/h, il totale da pagare è di ${evaluatePayrateTotal()}€ (${evaluatePayrateCollaborator().toStringAsFixed(2)}€ a collaboratore).",
-                  style: TextStyle(
-                    color: Theme.of(context).primaryColorLight,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                  SizedBox(
+                    width: 24,
+                    child: TextFormField(
+                      controller: payrateController,
+                      decoration: InputDecoration(
+                        border: UnderlineInputBorder(),
+                      ),
+                      onChanged: (value) {
+                        setState(() {
+                          if (applyDefaultPayrate) {
+                            applyDefaultPayrateToEveryone();
+                          }
+                        });
+                      },
+                      style: TextStyle(
+                        color: Theme.of(context).primaryColorLight,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-                ),
-                SizedBox(
-                  width: 40,
-                ),
-                Switch(
-                  onChanged: (bool value) {
-                    setState(() {
-                      applyDefaultPayrate = value;
-                    });
-                    if (applyDefaultPayrate) {
-                      applyDefaultPayrateToEveryone();
-                    }
-                  },
-                  value: applyDefaultPayrate,
-                  activeColor: Colors.orange,
-                ),
-                SizedBox(
-                  width: 10,
-                ),
-                Text(
-                  "Applica questa paga a tutti",
-                  style: TextStyle(
-                    color: Theme.of(context).primaryColorLight,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 30),
-            // Sezione per la lista dei collaboratori e il relativo campo di paga
-            if (lesson.collaborators.isNotEmpty)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
                   Text(
-                    "Paga per collaboratore: (totale da pagare di ${totalPayrate()}€)",
-                    style: Theme.of(context).primaryTextTheme.titleMedium,
+                    "€ a collaboratore, il totale da pagare è di ${evaluatePayrateTotal()}€.",
+                    style: TextStyle(
+                      color: Theme.of(context).primaryColorLight,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  ...List.generate(lesson.collaborators.length, (index) {
-                    final collaborator = lesson.collaborators[index];
-                    return Row(
-                      children: [
-                        Text(
-                          getCollaboratorName(collaborator),
-                          style: TextStyle(
-                            color: Theme.of(context).primaryColorLight,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(
-                          width: 20,
-                        ),
-                        SizedBox(
-                          width: 50,
-                          child: TextFormField(
-                            controller: collaboratorControllers[index],
-                            decoration: InputDecoration(
-                              suffix: Text(
-                                "€",
-                                style: TextStyle(
-                                  color: Theme.of(context).primaryColorLight,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              border: UnderlineInputBorder(),
-                            ),
-                            onChanged: (value) {
-                              setState(() {});
-                            },
+                  SizedBox(
+                    width: 40,
+                  ),
+                  Switch(
+                    onChanged: (bool value) {
+                      setState(() {
+                        applyDefaultPayrate = value;
+                      });
+                      if (applyDefaultPayrate) {
+                        applyDefaultPayrateToEveryone();
+                      }
+                    },
+                    value: applyDefaultPayrate,
+                    activeColor: Colors.orange,
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Text(
+                    "Applica questa paga a tutti",
+                    style: TextStyle(
+                      color: Theme.of(context).primaryColorLight,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 30),
+              // Sezione per la lista dei collaboratori e il relativo campo di paga
+              if (lesson.collaborators.isNotEmpty)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Paga per collaboratore: (Totale: ${totalPayrate()}€)",
+                      style: Theme.of(context).primaryTextTheme.titleMedium,
+                    ),
+                    ...List.generate(lesson.collaborators.length, (index) {
+                      final collaborator = lesson.collaborators[index];
+                      return Row(
+                        children: [
+                          Text(
+                            getCollaboratorName(collaborator),
                             style: TextStyle(
                               color: Theme.of(context).primaryColorLight,
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
+                          SizedBox(
+                            width: 20,
+                          ),
+                          SizedBox(
+                            width: 50,
+                            child: TextFormField(
+                              controller: collaboratorControllers[index],
+                              decoration: InputDecoration(
+                                suffix: Text(
+                                  "€",
+                                  style: TextStyle(
+                                    color: Theme.of(context).primaryColorLight,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                border: UnderlineInputBorder(),
+                              ),
+                              onChanged: (value) {
+                                setState(() {});
+                              },
+                              style: TextStyle(
+                                color: Theme.of(context).primaryColorLight,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    }),
+                  ],
+                ),
+              SizedBox(height: 30),
+              Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red.shade700,
+                        surfaceTintColor: Colors.blue.shade900,
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
                         ),
-                      ],
-                    );
-                  }),
-                ],
-              ),
-            SizedBox(height: 30),
-            Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red.shade700,
-                      surfaceTintColor: Colors.blue.shade900,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      onPressed: () {
+                        showConfirmDialog();
+                      },
+                      child: Text(
+                        'Annulla',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontFamily: 'Montserrat'),
                       ),
                     ),
-                    onPressed: () {
-                      showConfirmDialog();
-                    },
-                    child: Text(
-                      'Annulla',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          fontFamily: 'Montserrat'),
-                    ),
-                  ),
-                  SizedBox(width: 20),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green.shade700,
-                      textStyle: TextStyle(color: Colors.white),
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                    SizedBox(width: 20),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green.shade700,
+                        textStyle: TextStyle(color: Colors.white),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      onPressed: () {
+                        registerLesson();
+                      },
+                      child: Text(
+                        "Registra lezione",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Montserrat',
+                            color: Colors.white),
                       ),
                     ),
-                    onPressed: () {
-                      registerLesson();
-                    },
-                    child: Text(
-                      "Registra lezione",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Montserrat',
-                          color: Colors.white),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

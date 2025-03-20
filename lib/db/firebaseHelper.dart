@@ -8,6 +8,7 @@ import 'package:oservice/entities/entity.dart';
 import 'package:oservice/entities/exercise.dart';
 import 'package:oservice/entities/lesson.dart';
 import 'package:oservice/entities/payment.dart';
+import 'package:oservice/entities/taxinfo.dart';
 import 'package:oservice/utils/responseHandler.dart';
 import 'package:oservice/entities/location.dart';
 
@@ -20,11 +21,11 @@ class FirebaseHelper {
 
   static Future<List<Collaborator>> getAllCollaborators() async {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.COLLABORATORS);
+    db.collection(DbConstants.COLLABORATORS);
     QuerySnapshot<Map<String, dynamic>> querySnapshot = await collection.get();
     List<Collaborator> collaborators = [];
     for (QueryDocumentSnapshot<Map<String, dynamic>> queryDocumentSnapshot
-        in querySnapshot.docs) {
+    in querySnapshot.docs) {
       try {
         Map<String, dynamic> data = queryDocumentSnapshot.data();
         Collaborator collaborator = await Collaborator.fromMap(data)
@@ -39,11 +40,11 @@ class FirebaseHelper {
 
   static Future<List<Entity>> getAllEntities() async {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.ENTITIES);
+    db.collection(DbConstants.ENTITIES);
     QuerySnapshot<Map<String, dynamic>> querySnapshot = await collection.get();
     List<Entity> entities = [];
     for (QueryDocumentSnapshot<Map<String, dynamic>> queryDocumentSnapshot
-        in querySnapshot.docs) {
+    in querySnapshot.docs) {
       try {
         Map<String, dynamic> data = queryDocumentSnapshot.data();
         Entity entity = Entity.fromMap(data)
@@ -58,15 +59,15 @@ class FirebaseHelper {
     return entities;
   }
 
-  static Future<List<Entity>> getEntitiesByField(
-      String id, String field) async {
+  static Future<List<Entity>> getEntitiesByField(String id,
+      String field) async {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.ENTITIES);
+    db.collection(DbConstants.ENTITIES);
     QuerySnapshot<Map<String, dynamic>> querySnapshot =
-        await collection.where(field, isEqualTo: id).get();
+    await collection.where(field, isEqualTo: id).get();
     List<Entity> entities = [];
     for (QueryDocumentSnapshot<Map<String, dynamic>> queryDocumentSnapshot
-        in querySnapshot.docs) {
+    in querySnapshot.docs) {
       try {
         Map<String, dynamic> data = queryDocumentSnapshot.data();
         Entity entity = Entity.fromMap(data)
@@ -83,11 +84,11 @@ class FirebaseHelper {
 
   static Future<List<Location>> getAllLocations() async {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.LOCATIONS);
+    db.collection(DbConstants.LOCATIONS);
     QuerySnapshot<Map<String, dynamic>> querySnapshot = await collection.get();
     List<Location> locations = [];
     for (QueryDocumentSnapshot<Map<String, dynamic>> queryDocumentSnapshot
-        in querySnapshot.docs) {
+    in querySnapshot.docs) {
       try {
         Map<String, dynamic> data = queryDocumentSnapshot.data();
         Location location = Location.fromMap(data)
@@ -102,12 +103,18 @@ class FirebaseHelper {
 
   static Future<List<Lesson>> getAllLessons() async {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.LESSONS);
+    db.collection(DbConstants.LESSONS);
     int daysBefore = await getNumberOfDaysBeforeToBeVisualized();
-    Timestamp today = Timestamp.fromDate(DateTime(DateTime.now().year,
-        DateTime.now().month, DateTime.now().day - daysBefore));
+    Timestamp today = Timestamp.fromDate(DateTime(DateTime
+        .now()
+        .year,
+        DateTime
+            .now()
+            .month, DateTime
+            .now()
+            .day - daysBefore));
     Timestamp oneWeekFromNow =
-        Timestamp.fromDate(DateTime.now().add(Duration(days: 7)));
+    Timestamp.fromDate(DateTime.now().add(Duration(days: 7)));
     QuerySnapshot<Map<String, dynamic>> querySnapshot = await collection
         .where('endDate', isGreaterThanOrEqualTo: today)
         .where("startDate", isLessThanOrEqualTo: oneWeekFromNow)
@@ -115,7 +122,7 @@ class FirebaseHelper {
         .get();
     List<Lesson> lessons = [];
     for (QueryDocumentSnapshot<Map<String, dynamic>> queryDocumentSnapshot
-        in querySnapshot.docs) {
+    in querySnapshot.docs) {
       try {
         Map<String, dynamic> data = queryDocumentSnapshot.data();
         Lesson lesson = Lesson.fromMap(data)
@@ -141,12 +148,24 @@ class FirebaseHelper {
 
   static Future<List<Lesson>> getAllPastLessons() async {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.LESSONS);
+    db.collection(DbConstants.LESSONS);
     int daysBefore = await getNumberOfDaysBeforeToBeVisualizedInArchive();
     Timestamp today = Timestamp.fromDate(DateTime(
-        DateTime.now().year, DateTime.now().month, DateTime.now().day));
-    Timestamp targetDay = Timestamp.fromDate(DateTime(DateTime.now().year,
-        DateTime.now().month, DateTime.now().day - daysBefore));
+        DateTime
+            .now()
+            .year, DateTime
+        .now()
+        .month, DateTime
+        .now()
+        .day));
+    Timestamp targetDay = Timestamp.fromDate(DateTime(DateTime
+        .now()
+        .year,
+        DateTime
+            .now()
+            .month, DateTime
+            .now()
+            .day - daysBefore));
     QuerySnapshot<Map<String, dynamic>> querySnapshot = await collection
         .where("startDate", isLessThan: today)
         .where("endDate", isGreaterThanOrEqualTo: targetDay)
@@ -154,7 +173,7 @@ class FirebaseHelper {
         .get();
     List<Lesson> lessons = [];
     for (QueryDocumentSnapshot<Map<String, dynamic>> queryDocumentSnapshot
-        in querySnapshot.docs) {
+    in querySnapshot.docs) {
       try {
         Map<String, dynamic> data = queryDocumentSnapshot.data();
         Lesson lesson = Lesson.fromMap(data)
@@ -181,9 +200,15 @@ class FirebaseHelper {
 
   static Future<List<Lesson>> getAllUnpaidLessons() async {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.LESSONS);
+    db.collection(DbConstants.LESSONS);
     Timestamp today = Timestamp.fromDate(DateTime(
-        DateTime.now().year, DateTime.now().month, DateTime.now().day));
+        DateTime
+            .now()
+            .year, DateTime
+        .now()
+        .month, DateTime
+        .now()
+        .day));
     QuerySnapshot<Map<String, dynamic>> querySnapshot = await collection
         .where("startDate", isLessThan: today)
         .where("registered", isEqualTo: false)
@@ -191,7 +216,7 @@ class FirebaseHelper {
         .get();
     List<Lesson> lessons = [];
     for (QueryDocumentSnapshot<Map<String, dynamic>> queryDocumentSnapshot
-        in querySnapshot.docs) {
+    in querySnapshot.docs) {
       try {
         Map<String, dynamic> data = queryDocumentSnapshot.data();
         Lesson lesson = Lesson.fromMap(data)
@@ -218,12 +243,12 @@ class FirebaseHelper {
 
   static Future<List<Lesson>> getLessonsByField(String id, String field) async {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.LESSONS);
+    db.collection(DbConstants.LESSONS);
     QuerySnapshot<Map<String, dynamic>> querySnapshot =
-        await collection.where(field, isEqualTo: id).get();
+    await collection.where(field, isEqualTo: id).get();
     List<Lesson> lessons = [];
     for (QueryDocumentSnapshot<Map<String, dynamic>> queryDocumentSnapshot
-        in querySnapshot.docs) {
+    in querySnapshot.docs) {
       try {
         Map<String, dynamic> data = queryDocumentSnapshot.data();
         Lesson lesson = Lesson.fromMap(data)
@@ -249,11 +274,17 @@ class FirebaseHelper {
 
   static Future<List<Lesson>> getAllIncompleteLessons() async {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.LESSONS);
+    db.collection(DbConstants.LESSONS);
     Timestamp today = Timestamp.fromDate(DateTime(
-        DateTime.now().year, DateTime.now().month, DateTime.now().day));
+        DateTime
+            .now()
+            .year, DateTime
+        .now()
+        .month, DateTime
+        .now()
+        .day));
     Timestamp oneWeekFromNow =
-        Timestamp.fromDate(DateTime.now().add(Duration(days: 7)));
+    Timestamp.fromDate(DateTime.now().add(Duration(days: 7)));
     QuerySnapshot<Map<String, dynamic>> querySnapshot = await collection
         .where('endDate', isGreaterThanOrEqualTo: today)
         .where("startDate", isLessThanOrEqualTo: oneWeekFromNow)
@@ -261,7 +292,7 @@ class FirebaseHelper {
         .get();
     List<Lesson> lessons = [];
     for (QueryDocumentSnapshot<Map<String, dynamic>> queryDocumentSnapshot
-        in querySnapshot.docs) {
+    in querySnapshot.docs) {
       try {
         Map<String, dynamic> data = queryDocumentSnapshot.data();
         Lesson lesson = Lesson.fromMap(data)
@@ -287,11 +318,11 @@ class FirebaseHelper {
 
   static Future<List<Exercise>> getAllExercises() async {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.EXERCISES);
+    db.collection(DbConstants.EXERCISES);
     QuerySnapshot<Map<String, dynamic>> querySnapshot = await collection.get();
     List<Exercise> exercises = [];
     for (QueryDocumentSnapshot<Map<String, dynamic>> queryDocumentSnapshot
-        in querySnapshot.docs) {
+    in querySnapshot.docs) {
       try {
         Map<String, dynamic> data = queryDocumentSnapshot.data();
         Exercise exercise = Exercise.fromMap(data)
@@ -307,7 +338,7 @@ class FirebaseHelper {
   Future<Result<String>> addExercise(Exercise exercise) async {
     try {
       CollectionReference<Map<String, dynamic>> collection =
-          db.collection(DbConstants.EXERCISES);
+      db.collection(DbConstants.EXERCISES);
       await collection.add(exercise.toMap());
       return Success(data: exercise.title);
     } on Exception catch (e) {
@@ -318,9 +349,11 @@ class FirebaseHelper {
   Future<Result<String>> addCollaborator(Collaborator collaborator) async {
     try {
       CollectionReference<Map<String, dynamic>> collection =
-          db.collection(DbConstants.COLLABORATORS);
-      await collection.add(collaborator.toMap());
-      return Success(data: collaborator.name);
+      db.collection(DbConstants.COLLABORATORS);
+      DocumentReference<
+          Map<String, dynamic>> documentReference = await collection.add(
+          collaborator.toMap());
+      return Success(data: documentReference.id);
     } on Exception catch (e) {
       return Error(exception: e);
     }
@@ -329,7 +362,7 @@ class FirebaseHelper {
   Future<Result<String>> addEntity(Entity entity) async {
     try {
       CollectionReference<Map<String, dynamic>> collection =
-          db.collection(DbConstants.ENTITIES);
+      db.collection(DbConstants.ENTITIES);
       await collection.add(entity.toMap());
       return Success(data: entity.name);
     } on Exception catch (e) {
@@ -340,7 +373,7 @@ class FirebaseHelper {
   Future<Result<String>> updateEntity(Entity entity) async {
     try {
       CollectionReference<Map<String, dynamic>> collection =
-          db.collection(DbConstants.ENTITIES);
+      db.collection(DbConstants.ENTITIES);
       await collection.doc(entity.id).update(entity.toMap());
       return Success(data: entity.name);
     } on Exception catch (e) {
@@ -351,9 +384,21 @@ class FirebaseHelper {
   Future<Result<String>> addLesson(Lesson lesson) async {
     try {
       CollectionReference<Map<String, dynamic>> collection =
-          db.collection(DbConstants.LESSONS);
+      db.collection(DbConstants.LESSONS);
       DocumentReference<Map<String, dynamic>> documentReference =
-          await collection.add(lesson.toMap());
+      await collection.add(lesson.toMap());
+      return Success(data: documentReference.id);
+    } on Exception catch (e) {
+      return Error(exception: e);
+    }
+  }
+
+  Future<Result<String>> addTaxInfo(TaxInfo taxInfo) async {
+    try {
+      CollectionReference<Map<String, dynamic>> collection =
+      db.collection(DbConstants.TAX_INFO);
+      DocumentReference<Map<String, dynamic>> documentReference =
+      await collection.add(taxInfo.toMap());
       return Success(data: documentReference.id);
     } on Exception catch (e) {
       return Error(exception: e);
@@ -363,7 +408,7 @@ class FirebaseHelper {
   Future<Result<String>> updateLesson(Lesson lesson) async {
     try {
       CollectionReference<Map<String, dynamic>> collection =
-          db.collection(DbConstants.LESSONS);
+      db.collection(DbConstants.LESSONS);
       await collection.doc(lesson.id).update(lesson.toMap());
       return Success(data: lesson.id);
     } on Exception catch (e) {
@@ -374,9 +419,9 @@ class FirebaseHelper {
   Future<Result<String>> addLocation(Location location) async {
     try {
       CollectionReference<Map<String, dynamic>> collection =
-          db.collection(DbConstants.LOCATIONS);
+      db.collection(DbConstants.LOCATIONS);
       DocumentReference<Map<String, dynamic>> documentReference =
-          await collection.add(location.toMap());
+      await collection.add(location.toMap());
       return Success(data: documentReference.id);
     } on Exception catch (e) {
       return Error(exception: e);
@@ -386,7 +431,7 @@ class FirebaseHelper {
   Future<Result<String>> updateLocation(Location location) async {
     try {
       CollectionReference<Map<String, dynamic>> collection =
-          db.collection(DbConstants.LOCATIONS);
+      db.collection(DbConstants.LOCATIONS);
       await collection.doc(location.id).update(location.toMap());
       return Success(data: location.id);
     } on Exception catch (e) {
@@ -397,7 +442,7 @@ class FirebaseHelper {
   Future<Result<String>> saveLesson(Lesson lesson) async {
     try {
       CollectionReference<Map<String, dynamic>> collection =
-          db.collection(DbConstants.SAVED_COLLECTIONS);
+      db.collection(DbConstants.SAVED_COLLECTIONS);
       await collection.doc(DbConstants.SAVED_LESSON).update(lesson.toMap());
       return Success(data: DbConstants.SAVED_LESSON);
     } on Exception catch (e) {
@@ -407,19 +452,20 @@ class FirebaseHelper {
 
   static Future<Location> getLocationById(String id) {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.LOCATIONS);
+    db.collection(DbConstants.LOCATIONS);
     return collection
         .doc(id)
         .get()
         .then((DocumentSnapshot<Map<String, dynamic>> documentSnapshot) {
       Map<String, dynamic> data = documentSnapshot.data()!;
-      return Location.fromMap(data)..id = id;
+      return Location.fromMap(data)
+        ..id = id;
     });
   }
 
   static Future<Entity> getEntityById(String id) {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.ENTITIES);
+    db.collection(DbConstants.ENTITIES);
     return collection
         .doc(id)
         .get()
@@ -434,19 +480,20 @@ class FirebaseHelper {
 
   static Future<Exercise> getExerciseById(String id) {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.EXERCISES);
+    db.collection(DbConstants.EXERCISES);
     return collection
         .doc(id)
         .get()
         .then((DocumentSnapshot<Map<String, dynamic>> documentSnapshot) {
       Map<String, dynamic> data = documentSnapshot.data()!;
-      return Exercise.fromMap(data)..id = id;
+      return Exercise.fromMap(data)
+        ..id = id;
     });
   }
 
   static Future<Collaborator> getCollaboratorById(String id) {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.COLLABORATORS);
+    db.collection(DbConstants.COLLABORATORS);
     return collection
         .doc(id)
         .get()
@@ -459,7 +506,7 @@ class FirebaseHelper {
 
   static Future<CollaboratorExtended> getCollaboratorExtendedById(String id) {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.COLLABORATORS);
+    db.collection(DbConstants.COLLABORATORS);
     return collection
         .doc(id)
         .get()
@@ -469,6 +516,36 @@ class FirebaseHelper {
         ..id = id
         ..lessons = populateLessons(data['lessons']);
     });
+  }
+
+  static Future<TaxInfo> getTaxInfoById(String id) {
+    CollectionReference<Map<String, dynamic>> collection =
+    db.collection(DbConstants.TAX_INFO);
+    return collection
+        .doc(id)
+        .get()
+        .then((DocumentSnapshot<Map<String, dynamic>> documentSnapshot) {
+      Map<String, dynamic> data = documentSnapshot.data()!;
+      return TaxInfo.fromMap(data)
+        ..id = id;
+    });
+  }
+
+  static Future<TaxInfo?> getTaxInfoByCollaboratorId(
+      String collaboratorId) async {
+    CollectionReference<Map<String, dynamic>> collection =
+    db.collection(DbConstants.TAX_INFO);
+    QuerySnapshot<Map<String, dynamic>> querySnapshot = await collection
+        .where("collaboratorId", isEqualTo: collaboratorId)
+        .get();
+    if (querySnapshot.docs.isEmpty) {
+      return null;
+    }
+    QueryDocumentSnapshot<Map<String, dynamic>> queryDocumentSnapshot =
+        querySnapshot.docs.first;
+    Map<String, dynamic> data = queryDocumentSnapshot.data();
+    return TaxInfo.fromMap(data)
+      ..id = queryDocumentSnapshot.id;
   }
 
   static List<String> populateLessons(List<dynamic> lessons) {
@@ -481,13 +558,14 @@ class FirebaseHelper {
 
   static Future<Lesson> getLessonById(String id) {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.LESSONS);
+    db.collection(DbConstants.LESSONS);
     return collection
         .doc(id)
         .get()
         .then((DocumentSnapshot<Map<String, dynamic>> documentSnapshot) async {
       Map<String, dynamic> data = documentSnapshot.data()!;
-      Lesson lesson = Lesson.fromMap(data)..collaborators = [];
+      Lesson lesson = Lesson.fromMap(data)
+        ..collaborators = [];
       lesson.addId(id);
       lesson.addLocation(await getLocationById(data['location']));
       lesson.addEntity(await getEntityById(data['entity']));
@@ -504,13 +582,14 @@ class FirebaseHelper {
 
   static Future<Lesson> getSavedLesson() {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.SAVED_COLLECTIONS);
+    db.collection(DbConstants.SAVED_COLLECTIONS);
     return collection
         .doc(DbConstants.SAVED_LESSON)
         .get()
         .then((DocumentSnapshot<Map<String, dynamic>> documentSnapshot) async {
       Map<String, dynamic> data = documentSnapshot.data()!;
-      Lesson lesson = Lesson.fromMap(data)..collaborators = [];
+      Lesson lesson = Lesson.fromMap(data)
+        ..collaborators = [];
       lesson.addId("");
       lesson.addLocation(await getLocationById(data['location']));
       lesson.addEntity(await getEntityById(data['entity']));
@@ -563,6 +642,24 @@ class FirebaseHelper {
     }
   }
 
+  static Future<Result<String>> deleteExercise(String id) async {
+    try {
+      await db.collection(DbConstants.EXERCISES).doc(id).delete();
+      return Success(data: id);
+    } on Exception catch (e) {
+      return Error(exception: e);
+    }
+  }
+
+  static Future<Result<String>> deletePayment(String id) async {
+    try {
+      await db.collection(DbConstants.PAYMENTS).doc(id).delete();
+      return Success(data: id);
+    } on Exception catch (e) {
+      return Error(exception: e);
+    }
+  }
+
   static Future<List<Collaborator>> populateCollaborators(
       Map<String, dynamic> data) async {
     List<Collaborator> collaborators = [];
@@ -589,32 +686,29 @@ class FirebaseHelper {
     return exercises;
   }
 
-  static updateCollaboratorsLesson(
-      List<Collaborator> chosenCollaborators, String lessonId) async {
+  static updateCollaboratorsLesson(List<Collaborator> chosenCollaborators,
+      String lessonId) async {
     for (Collaborator collaborator in chosenCollaborators) {
       CollaboratorExtended collaboratorExtended =
-          await CollaboratorExtended.fromCollaborator(collaborator);
+      await CollaboratorExtended.fromCollaborator(collaborator);
       collaboratorExtended.addLesson(lessonId);
       db.collection(DbConstants.COLLABORATORS).doc(collaborator.id).update({
         "lessons":
-            collaboratorExtended.lessons!.map((lesson) => lessonId).toList(),
+        collaboratorExtended.lessons!.map((lesson) => lessonId).toList(),
       });
     }
   }
 
-  static removeCollaboratorsLesson(
-      List<Collaborator> chosenCollaborators, String lessonId) async {
+  static removeCollaboratorsLesson(List<Collaborator> chosenCollaborators,
+      String lessonId) async {
     for (Collaborator collaborator in chosenCollaborators) {
       CollaboratorExtended collaboratorExtended =
-          await FirebaseHelper.getCollaboratorExtendedById(collaborator.id);
+      await FirebaseHelper.getCollaboratorExtendedById(collaborator.id);
       try {
-        print("DAJE");
-        print(collaboratorExtended.toString());
         collaboratorExtended.removeLesson(lessonId);
-        print("ROMA");
         db.collection(DbConstants.COLLABORATORS).doc(collaborator.id).update({
           "lessons":
-              collaboratorExtended.lessons!.map((lesson) => lessonId).toList(),
+          collaboratorExtended.lessons!.map((lesson) => lessonId).toList(),
         });
       } on Exception catch (e) {
         print("Errore durante la rimozione della lezione: $e");
@@ -625,7 +719,7 @@ class FirebaseHelper {
   static Future<Result<String>> setIsLessonSaved(bool value) async {
     try {
       CollectionReference<Map<String, dynamic>> collection =
-          db.collection(DbConstants.SAVED_COLLECTIONS);
+      db.collection(DbConstants.SAVED_COLLECTIONS);
       await collection
           .doc(DbConstants.IS_SAVED_LESSON)
           .update({"value": value});
@@ -637,7 +731,7 @@ class FirebaseHelper {
 
   static Future<bool> getIsLessonSaved() async {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.SAVED_COLLECTIONS);
+    db.collection(DbConstants.SAVED_COLLECTIONS);
     return collection
         .doc(DbConstants.IS_SAVED_LESSON)
         .get()
@@ -650,7 +744,7 @@ class FirebaseHelper {
   static Future<Result<String>> setIsLessonEditing(bool value) async {
     try {
       CollectionReference<Map<String, dynamic>> collection =
-          db.collection(DbConstants.SAVED_COLLECTIONS);
+      db.collection(DbConstants.SAVED_COLLECTIONS);
       await collection.doc(DbConstants.EDIT_LESSON).update({"value": value});
       return Success(data: value.toString());
     } on Exception catch (e) {
@@ -660,7 +754,7 @@ class FirebaseHelper {
 
   static Future<bool> getIsLessonEditing() async {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.SAVED_COLLECTIONS);
+    db.collection(DbConstants.SAVED_COLLECTIONS);
     return collection
         .doc(DbConstants.EDIT_LESSON)
         .get()
@@ -673,7 +767,7 @@ class FirebaseHelper {
   static Future<Result<String>> setIsCollaboratorSaved(bool value) async {
     try {
       CollectionReference<Map<String, dynamic>> collection =
-          db.collection(DbConstants.SAVED_COLLECTIONS);
+      db.collection(DbConstants.SAVED_COLLECTIONS);
       await collection
           .doc(DbConstants.EDIT_COLLABORATOR)
           .update({"value": value});
@@ -685,7 +779,7 @@ class FirebaseHelper {
 
   static Future<bool> getIsCollaboratorSaved() async {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.SAVED_COLLECTIONS);
+    db.collection(DbConstants.SAVED_COLLECTIONS);
     return collection
         .doc(DbConstants.EDIT_COLLABORATOR)
         .get()
@@ -698,7 +792,7 @@ class FirebaseHelper {
   static Future<Result<String>> setIsExerciseSaved(bool value) async {
     try {
       CollectionReference<Map<String, dynamic>> collection =
-          db.collection(DbConstants.SAVED_COLLECTIONS);
+      db.collection(DbConstants.SAVED_COLLECTIONS);
       await collection.doc(DbConstants.EDIT_EXERCISE).update({"value": value});
       return Success(data: value.toString());
     } on Exception catch (e) {
@@ -708,7 +802,7 @@ class FirebaseHelper {
 
   static Future<bool> getIsExerciseSaved() async {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.SAVED_COLLECTIONS);
+    db.collection(DbConstants.SAVED_COLLECTIONS);
     return collection
         .doc(DbConstants.EDIT_EXERCISE)
         .get()
@@ -721,7 +815,7 @@ class FirebaseHelper {
   static Future<Result<String>> setIsLocationSaved(bool value) async {
     try {
       CollectionReference<Map<String, dynamic>> collection =
-          db.collection(DbConstants.SAVED_COLLECTIONS);
+      db.collection(DbConstants.SAVED_COLLECTIONS);
       await collection.doc(DbConstants.EDIT_LOCATION).update({"value": value});
       return Success(data: value.toString());
     } on Exception catch (e) {
@@ -731,7 +825,7 @@ class FirebaseHelper {
 
   static Future<bool> getIsLocationSaved() async {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.SAVED_COLLECTIONS);
+    db.collection(DbConstants.SAVED_COLLECTIONS);
     return collection
         .doc(DbConstants.EDIT_LOCATION)
         .get()
@@ -744,7 +838,7 @@ class FirebaseHelper {
   static Future<Result<String>> setIsEntitySaved(bool value) async {
     try {
       CollectionReference<Map<String, dynamic>> collection =
-          db.collection(DbConstants.SAVED_COLLECTIONS);
+      db.collection(DbConstants.SAVED_COLLECTIONS);
       await collection.doc(DbConstants.EDIT_ENTITY).update({"value": value});
       return Success(data: value.toString());
     } on Exception catch (e) {
@@ -754,7 +848,7 @@ class FirebaseHelper {
 
   static Future<bool> getIsEntitySaved() async {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.SAVED_COLLECTIONS);
+    db.collection(DbConstants.SAVED_COLLECTIONS);
     return collection
         .doc(DbConstants.EDIT_ENTITY)
         .get()
@@ -766,7 +860,7 @@ class FirebaseHelper {
 
   static Future<bool> getIsEditLessonMode() async {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.SAVED_COLLECTIONS);
+    db.collection(DbConstants.SAVED_COLLECTIONS);
     return collection
         .doc(DbConstants.EDIT_LESSON)
         .get()
@@ -779,7 +873,7 @@ class FirebaseHelper {
   static Future<Result<String>> setIdSavedLesson(String value) async {
     try {
       CollectionReference<Map<String, dynamic>> collection =
-          db.collection(DbConstants.SAVED_COLLECTIONS);
+      db.collection(DbConstants.SAVED_COLLECTIONS);
       await collection.doc(DbConstants.EDIT_LESSON).update({"id": value});
       return Success(data: value);
     } on Exception catch (e) {
@@ -789,7 +883,7 @@ class FirebaseHelper {
 
   static Future<String> getIdSavedLesson() async {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.SAVED_COLLECTIONS);
+    db.collection(DbConstants.SAVED_COLLECTIONS);
     return collection
         .doc(DbConstants.EDIT_LESSON)
         .get()
@@ -801,7 +895,7 @@ class FirebaseHelper {
 
   static Future<bool> getIsEditCollaboratorMode() async {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.SAVED_COLLECTIONS);
+    db.collection(DbConstants.SAVED_COLLECTIONS);
     return collection
         .doc(DbConstants.EDIT_COLLABORATOR)
         .get()
@@ -814,7 +908,7 @@ class FirebaseHelper {
   static Future<Result<String>> setIdSavedCollaborator(String value) async {
     try {
       CollectionReference<Map<String, dynamic>> collection =
-          db.collection(DbConstants.SAVED_COLLECTIONS);
+      db.collection(DbConstants.SAVED_COLLECTIONS);
       await collection.doc(DbConstants.EDIT_COLLABORATOR).update({"id": value});
       return Success(data: value);
     } on Exception catch (e) {
@@ -824,7 +918,7 @@ class FirebaseHelper {
 
   static Future<String> getIdSavedCollaborator() async {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.SAVED_COLLECTIONS);
+    db.collection(DbConstants.SAVED_COLLECTIONS);
     return collection
         .doc(DbConstants.EDIT_COLLABORATOR)
         .get()
@@ -836,7 +930,7 @@ class FirebaseHelper {
 
   static Future<bool> getIsEditExerciseMode() async {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.SAVED_COLLECTIONS);
+    db.collection(DbConstants.SAVED_COLLECTIONS);
     return collection
         .doc(DbConstants.EDIT_EXERCISE)
         .get()
@@ -849,7 +943,7 @@ class FirebaseHelper {
   static Future<Result<String>> setIdSavedExercise(String value) async {
     try {
       CollectionReference<Map<String, dynamic>> collection =
-          db.collection(DbConstants.SAVED_COLLECTIONS);
+      db.collection(DbConstants.SAVED_COLLECTIONS);
       await collection.doc(DbConstants.EDIT_EXERCISE).update({"id": value});
       return Success(data: value);
     } on Exception catch (e) {
@@ -859,7 +953,7 @@ class FirebaseHelper {
 
   static Future<String> getIdSavedExercise() async {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.SAVED_COLLECTIONS);
+    db.collection(DbConstants.SAVED_COLLECTIONS);
     return collection
         .doc(DbConstants.EDIT_EXERCISE)
         .get()
@@ -871,7 +965,7 @@ class FirebaseHelper {
 
   static Future<bool> getIsEditLocationMode() async {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.SAVED_COLLECTIONS);
+    db.collection(DbConstants.SAVED_COLLECTIONS);
     return collection
         .doc(DbConstants.EDIT_LOCATION)
         .get()
@@ -884,7 +978,7 @@ class FirebaseHelper {
   static Future<Result<String>> setIdSavedLocation(String value) async {
     try {
       CollectionReference<Map<String, dynamic>> collection =
-          db.collection(DbConstants.SAVED_COLLECTIONS);
+      db.collection(DbConstants.SAVED_COLLECTIONS);
       await collection.doc(DbConstants.EDIT_LOCATION).update({"id": value});
       return Success(data: value);
     } on Exception catch (e) {
@@ -894,7 +988,7 @@ class FirebaseHelper {
 
   static Future<String> getIdSavedLocation() async {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.SAVED_COLLECTIONS);
+    db.collection(DbConstants.SAVED_COLLECTIONS);
     return collection
         .doc(DbConstants.EDIT_LOCATION)
         .get()
@@ -906,7 +1000,7 @@ class FirebaseHelper {
 
   static Future<bool> getIsEditEntityMode() async {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.SAVED_COLLECTIONS);
+    db.collection(DbConstants.SAVED_COLLECTIONS);
     return collection
         .doc(DbConstants.EDIT_ENTITY)
         .get()
@@ -919,7 +1013,7 @@ class FirebaseHelper {
   static Future<Result<String>> setIdSavedEntity(String value) async {
     try {
       CollectionReference<Map<String, dynamic>> collection =
-          db.collection(DbConstants.SAVED_COLLECTIONS);
+      db.collection(DbConstants.SAVED_COLLECTIONS);
       await collection.doc(DbConstants.EDIT_ENTITY).update({"id": value});
       return Success(data: value);
     } on Exception catch (e) {
@@ -929,7 +1023,7 @@ class FirebaseHelper {
 
   static Future<String> getIdSavedEntity() async {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.SAVED_COLLECTIONS);
+    db.collection(DbConstants.SAVED_COLLECTIONS);
     return collection
         .doc(DbConstants.EDIT_ENTITY)
         .get()
@@ -941,7 +1035,7 @@ class FirebaseHelper {
 
   static Future<String> getEventIdSavedLesson() async {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.SAVED_COLLECTIONS);
+    db.collection(DbConstants.SAVED_COLLECTIONS);
     return collection
         .doc(DbConstants.SAVED_LESSON)
         .get()
@@ -953,7 +1047,7 @@ class FirebaseHelper {
 
   static Future<int> getNumberOfDaysBeforeToBeVisualized() async {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.SETTINGS);
+    db.collection(DbConstants.SETTINGS);
     return collection
         .doc(DbConstants.DAYS_BEFORE)
         .get()
@@ -965,7 +1059,7 @@ class FirebaseHelper {
 
   static Future<int> getNumberOfDaysBeforeToBeVisualizedInArchive() async {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.SETTINGS);
+    db.collection(DbConstants.SETTINGS);
     return collection
         .doc(DbConstants.DAYS_BEFORE)
         .get()
@@ -977,7 +1071,7 @@ class FirebaseHelper {
 
   static Future<bool> getNewEventNotification() {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.SETTINGS);
+    db.collection(DbConstants.SETTINGS);
     return collection
         .doc(DbConstants.NEW_EVENT_NOTIFICATION)
         .get()
@@ -989,7 +1083,7 @@ class FirebaseHelper {
 
   static Future<bool> getDeletedEventNotification() {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.SETTINGS);
+    db.collection(DbConstants.SETTINGS);
     return collection
         .doc(DbConstants.DELETED_EVENT_NOTIFICATION)
         .get()
@@ -1001,7 +1095,7 @@ class FirebaseHelper {
 
   static Future<calendar.EventReminders> getEventReminders() {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.SETTINGS);
+    db.collection(DbConstants.SETTINGS);
     return collection
         .doc(DbConstants.EVENT_REMINDERS)
         .get()
@@ -1024,8 +1118,10 @@ class FirebaseHelper {
   static Future<Result<String>> setEventReminders(List<int> reminders) async {
     try {
       CollectionReference<Map<String, dynamic>> collection =
-          db.collection(DbConstants.SETTINGS);
-      await collection.doc(DbConstants.EVENT_REMINDERS).update({"value": reminders});
+      db.collection(DbConstants.SETTINGS);
+      await collection
+          .doc(DbConstants.EVENT_REMINDERS)
+          .update({"value": reminders});
       return Success(data: reminders.toString());
     } on Exception catch (e) {
       return Error(exception: e);
@@ -1035,7 +1131,7 @@ class FirebaseHelper {
   static Future<Result<String>> setNewEventNotification(bool value) async {
     try {
       CollectionReference<Map<String, dynamic>> collection =
-          db.collection(DbConstants.SETTINGS);
+      db.collection(DbConstants.SETTINGS);
       await collection
           .doc(DbConstants.NEW_EVENT_NOTIFICATION)
           .update({"value": value});
@@ -1048,7 +1144,7 @@ class FirebaseHelper {
   static Future<Result<String>> setDeletedEventNotification(bool value) async {
     try {
       CollectionReference<Map<String, dynamic>> collection =
-          db.collection(DbConstants.SETTINGS);
+      db.collection(DbConstants.SETTINGS);
       await collection
           .doc(DbConstants.DELETED_EVENT_NOTIFICATION)
           .update({"value": value});
@@ -1058,10 +1154,11 @@ class FirebaseHelper {
     }
   }
 
-  static Future<Result<String>> setNumberOfDaysBeforeToBeVisualized(int value) async {
+  static Future<Result<String>> setNumberOfDaysBeforeToBeVisualized(
+      int value) async {
     try {
       CollectionReference<Map<String, dynamic>> collection =
-          db.collection(DbConstants.SETTINGS);
+      db.collection(DbConstants.SETTINGS);
       await collection.doc(DbConstants.DAYS_BEFORE).update({"value": value});
       return Success(data: value.toString());
     } on Exception catch (e) {
@@ -1069,11 +1166,14 @@ class FirebaseHelper {
     }
   }
 
-  static Future<Result<String>> setNumberOfDaysBeforeToBeVisualizedInArchive(int value) async {
+  static Future<Result<String>> setNumberOfDaysBeforeToBeVisualizedInArchive(
+      int value) async {
     try {
       CollectionReference<Map<String, dynamic>> collection =
-          db.collection(DbConstants.SETTINGS);
-      await collection.doc(DbConstants.DAYS_BEFORE).update({"archiveValue": value});
+      db.collection(DbConstants.SETTINGS);
+      await collection
+          .doc(DbConstants.DAYS_BEFORE)
+          .update({"archiveValue": value});
       return Success(data: value.toString());
     } on Exception catch (e) {
       return Error(exception: e);
@@ -1083,8 +1183,10 @@ class FirebaseHelper {
   static Future<Result<String>> setDefaultPayrate(String value) async {
     try {
       CollectionReference<Map<String, dynamic>> collection =
-          db.collection(DbConstants.SETTINGS);
-      await collection.doc(DbConstants.PAYRATE_DEFAULT).update({"value": value});
+      db.collection(DbConstants.SETTINGS);
+      await collection
+          .doc(DbConstants.PAYRATE_DEFAULT)
+          .update({"value": value});
       return Success(data: value);
     } on Exception catch (e) {
       return Error(exception: e);
@@ -1094,7 +1196,7 @@ class FirebaseHelper {
   static Future<Result<String>> setIdRegisteredLesson(String value) async {
     try {
       CollectionReference<Map<String, dynamic>> collection =
-          db.collection(DbConstants.SAVED_COLLECTIONS);
+      db.collection(DbConstants.SAVED_COLLECTIONS);
       await collection.doc(DbConstants.REGISTERED_LESSON).update({"id": value});
       return Success(data: value);
     } on Exception catch (e) {
@@ -1104,7 +1206,7 @@ class FirebaseHelper {
 
   static Future<String> getIdRegisteredLesson() async {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.SAVED_COLLECTIONS);
+    db.collection(DbConstants.SAVED_COLLECTIONS);
     return collection
         .doc(DbConstants.REGISTERED_LESSON)
         .get()
@@ -1116,7 +1218,7 @@ class FirebaseHelper {
 
   static Future<String> getDefaultPayrate() async {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.SETTINGS);
+    db.collection(DbConstants.SETTINGS);
     return collection
         .doc(DbConstants.PAYRATE_DEFAULT)
         .get()
@@ -1133,16 +1235,16 @@ class FirebaseHelper {
 
   static Future<String> addPayment(Map<String, dynamic> payment) async {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.PAYMENTS);
+    db.collection(DbConstants.PAYMENTS);
     DocumentReference<Map<String, dynamic>> documentReference =
-        await collection.add(payment);
+    await collection.add(payment);
     return documentReference.id;
   }
 
   static Future<Result<String>> updatePayment(Payment payment) async {
     try {
       CollectionReference<Map<String, dynamic>> collection =
-          db.collection(DbConstants.PAYMENTS);
+      db.collection(DbConstants.PAYMENTS);
       await collection.doc(payment.id).update(payment.toMap());
       return Success(data: payment.id);
     } on Exception catch (e) {
@@ -1152,7 +1254,7 @@ class FirebaseHelper {
 
   static Future<List<Payment>> retrievePayments(int year, int month) async {
     CollectionReference<Map<String, dynamic>> collection =
-        db.collection(DbConstants.PAYMENTS);
+    db.collection(DbConstants.PAYMENTS);
     Timestamp firstDay = Timestamp.fromDate(DateTime(year, month, 01));
     Timestamp lastDay = Timestamp.fromDate(DateTime(year, month + 1, 01));
     QuerySnapshot<Map<String, dynamic>> querySnapshot = await collection
@@ -1161,10 +1263,36 @@ class FirebaseHelper {
         .get();
     List<Payment> payments = [];
     for (QueryDocumentSnapshot<Map<String, dynamic>> queryDocumentSnapshot
-        in querySnapshot.docs) {
+    in querySnapshot.docs) {
       try {
         Map<String, dynamic> data = queryDocumentSnapshot.data();
-        Payment payment = Payment.fromMap(data)..id = queryDocumentSnapshot.id;
+        Payment payment = Payment.fromMap(data)
+          ..id = queryDocumentSnapshot.id;
+        payments.add(payment);
+      } on Exception catch (e) {
+        print("Error: $e");
+      }
+    }
+    return payments;
+  }
+
+  static Future<List<Payment>> retrievePaymentsByCollaborator(int year, int month, String collaboratorName) async {
+    CollectionReference<Map<String, dynamic>> collection =
+    db.collection(DbConstants.PAYMENTS);
+    Timestamp firstDay = Timestamp.fromDate(DateTime(year, month, 01));
+    Timestamp lastDay = Timestamp.fromDate(DateTime(year, month + 1, 01));
+    QuerySnapshot<Map<String, dynamic>> querySnapshot = await collection
+        .where("date", isLessThan: lastDay)
+        .where("date", isGreaterThanOrEqualTo: firstDay)
+        .where("name", isEqualTo: collaboratorName)
+        .get();
+    List<Payment> payments = [];
+    for (QueryDocumentSnapshot<Map<String, dynamic>> queryDocumentSnapshot
+    in querySnapshot.docs) {
+      try {
+        Map<String, dynamic> data = queryDocumentSnapshot.data();
+        Payment payment = Payment.fromMap(data)
+          ..id = queryDocumentSnapshot.id;
         payments.add(payment);
       } on Exception catch (e) {
         print("Error: $e");
@@ -1176,7 +1304,9 @@ class FirebaseHelper {
   static Future<List<Payment>> retrieveYearlyPayments() async {
     CollectionReference<Map<String, dynamic>> collection =
     db.collection(DbConstants.PAYMENTS);
-    int year = DateTime.now().year;
+    int year = DateTime
+        .now()
+        .year;
     Timestamp firstDay = Timestamp.fromDate(DateTime(year, 01, 01));
     Timestamp lastDay = Timestamp.fromDate(DateTime(year, 12, 31));
     QuerySnapshot<Map<String, dynamic>> querySnapshot = await collection
@@ -1188,7 +1318,8 @@ class FirebaseHelper {
     in querySnapshot.docs) {
       try {
         Map<String, dynamic> data = queryDocumentSnapshot.data();
-        Payment payment = Payment.fromMap(data)..id = queryDocumentSnapshot.id;
+        Payment payment = Payment.fromMap(data)
+          ..id = queryDocumentSnapshot.id;
         payments.add(payment);
       } on Exception catch (e) {
         print("Error: $e");
@@ -1196,4 +1327,29 @@ class FirebaseHelper {
     }
     return payments;
   }
+
+  static Future<String> getIdSavedTaxInfo() async {
+    CollectionReference<Map<String, dynamic>> collection =
+    db.collection(DbConstants.SAVED_COLLECTIONS);
+    return collection
+        .doc(DbConstants.SAVED_TAX_INFO)
+        .get()
+        .then((DocumentSnapshot<Map<String, dynamic>> documentSnapshot) async {
+      Map<String, dynamic> data = documentSnapshot.data()!;
+      return data["id"];
+    });
+  }
+
+  static Future<Result<String>> setIdSavedTaxInfo(String value) async {
+    try {
+      CollectionReference<Map<String, dynamic>> collection =
+      db.collection(DbConstants.SAVED_COLLECTIONS);
+      await collection.doc(DbConstants.SAVED_TAX_INFO).update({"id": value});
+      return Success(data: value);
+    } on Exception catch (e) {
+      return Error(exception: e);
+    }
+  }
+
+
 }

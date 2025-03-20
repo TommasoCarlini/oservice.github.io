@@ -10,6 +10,7 @@ class DbConstants {
   static const String LOCATIONS = 'locations';
   static const String SETTINGS = 'settings';
   static const String PAYMENTS = 'payments';
+  static const String TAX_INFO = 'taxInfo';
 
   static const String SAVED_COLLECTIONS = 'savedLesson';
   static const String IS_SAVED_LESSON = 'isSavedLesson';
@@ -20,6 +21,7 @@ class DbConstants {
   static const String SAVED_EXERCISE = 'savedExercise';
   static const String SAVED_LOCATION = 'savedLocation';
   static const String SAVED_COLLABORATOR = 'savedCollaborator';
+  static const String SAVED_TAX_INFO = 'savedTaxInfo';
 
   static const String EDIT_LESSON = 'isEditingLesson';
   static const String EDIT_ENTITY = 'isEditingEntity';

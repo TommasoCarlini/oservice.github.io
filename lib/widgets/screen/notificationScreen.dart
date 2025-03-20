@@ -20,8 +20,7 @@ class NotificationScreen extends StatefulWidget {
 }
 
 class _NotificationScreenState extends State<NotificationScreen> {
-  // Variabili di impostazione (in un caso reale dovrebbero essere caricate dal DB)
-  TextEditingController payrateController = TextEditingController();
+  // TextEditingController payrateController = TextEditingController();
   TextEditingController visualizedDaysController = TextEditingController();
   TextEditingController archiveDaysController = TextEditingController();
   bool newEventNotification = false;
@@ -44,7 +43,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
     bool newEventNotificationDb = await FirebaseHelper.getNewEventNotification();
     calendar.EventReminders eventRemindersDb = await FirebaseHelper.getEventReminders();
     setState(() {
-      payrateController.text = payrate;
+      // payrateController.text = payrate;
       visualizedDaysController.text = visualizedDays.toString();
       archiveDaysController.text = archiveDays.toString();
       newEventNotification = newEventNotificationDb;
@@ -62,7 +61,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
   @override
   void dispose() {
-    payrateController.dispose();
+    // payrateController.dispose();
     visualizedDaysController.dispose();
     archiveDaysController.dispose();
     super.dispose();
@@ -206,12 +205,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
   // Funzione di salvataggio (da completare con il salvataggio su DB)
   Future<int> updateSettings() async {
-    Result<String> res1 = await FirebaseHelper.setDefaultPayrate(payrateController.text);
+    // Result<String> res1 = await FirebaseHelper.setDefaultPayrate(payrateController.text);
     Result<String> res2 = await FirebaseHelper.setNumberOfDaysBeforeToBeVisualized(int.parse(visualizedDaysController.text));
     Result<String> res3 = await FirebaseHelper.setNumberOfDaysBeforeToBeVisualizedInArchive(int.parse(archiveDaysController.text));
     Result<String> res4 = await FirebaseHelper.setNewEventNotification(newEventNotification);
     Result<String> res5 = await FirebaseHelper.setEventReminders(eventReminders);
-    if (res1 is Error || res2 is Error || res3 is Error || res4 is Error || res5 is Error) {
+    if (res2 is Error || res3 is Error || res4 is Error || res5 is Error) {
       showErrorSnackbar(Exception("Errore durante il salvataggio delle impostazioni"));
       return 1;
     }
@@ -263,37 +262,37 @@ class _NotificationScreenState extends State<NotificationScreen> {
               ),
               SizedBox(height: 40),
               // Sezione per "payrate"
-              Row(
-                children: [
-                  _settingHeader(
-                      "Payrate", "Imposta il valore della paga (in €/h)"),
-                  SizedBox(width: 20),
-                  SizedBox(
-                    width: 55,
-                    child: TextFormField(
-                      style: TextStyle(
-                        color: Theme.of(context).primaryColorLight,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      controller: payrateController,
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                        suffix: Text(
-                          "€/h",
-                          style: TextStyle(
-                            color: Theme.of(context).primaryColorLight,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        border: UnderlineInputBorder(),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 20),
+              // Row(
+              //   children: [
+              //     _settingHeader(
+              //         "Payrate", "Imposta il valore della paga (in €/h)"),
+              //     SizedBox(width: 20),
+              //     SizedBox(
+              //       width: 55,
+              //       child: TextFormField(
+              //         style: TextStyle(
+              //           color: Theme.of(context).primaryColorLight,
+              //           fontSize: 16,
+              //           fontWeight: FontWeight.bold,
+              //         ),
+              //         controller: payrateController,
+              //         keyboardType: TextInputType.number,
+              //         decoration: InputDecoration(
+              //           suffix: Text(
+              //             "€/h",
+              //             style: TextStyle(
+              //               color: Theme.of(context).primaryColorLight,
+              //               fontSize: 16,
+              //               fontWeight: FontWeight.bold,
+              //             ),
+              //           ),
+              //           border: UnderlineInputBorder(),
+              //         ),
+              //       ),
+              //     ),
+              //   ],
+              // ),
+              // SizedBox(height: 20),
               // Sezione per "numberOfDaysBeforeToBeVisualized"
               Row(
                 children: [

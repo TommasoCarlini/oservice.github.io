@@ -60,7 +60,7 @@ class _ExerciseCardActionState extends State<ExerciseCardAction> {
           icon: Icon(Icons.warning_rounded, color: Colors.red.shade700),
           title: Text('Conferma'),
           content: Text(
-              'Sei sicuro di voler rimuovere ${widget.exercise.title} dai luoghi?'),
+              'Sei sicuro di voler rimuovere ${widget.exercise.title} dagli esercizi?'),
           actions: [
             TextButton(
               onPressed: () {
@@ -89,7 +89,7 @@ class _ExerciseCardActionState extends State<ExerciseCardAction> {
                   return;
                 } else {
                   Result<String> result =
-                  await FirebaseHelper.deleteLocation(widget.exercise.id);
+                  await FirebaseHelper.deleteExercise(widget.exercise.id);
                   if (result is Success) {
                     showSuccessSnackbar(widget.exercise.title);
                   } else {

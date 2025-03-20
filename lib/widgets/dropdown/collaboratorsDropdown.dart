@@ -45,7 +45,7 @@ class CollaboratorDropdown extends StatelessWidget {
                             ),
                             Text(collaborator.name),
                             englishLesson && collaborator.englishSpeaker
-                                ? Icon(Icons.flag_rounded)
+                                ? Icon(Icons.translate_rounded)
                                 : SizedBox(),
                           ],
                         )
@@ -57,7 +57,7 @@ class CollaboratorDropdown extends StatelessWidget {
                             ),
                             Text(collaborator.name),
                             englishLesson && collaborator.englishSpeaker
-                                ? Icon(Icons.flag_rounded)
+                                ? Icon(Icons.translate_rounded)
                                 : SizedBox(),
                           ],
                         ),

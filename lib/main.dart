@@ -16,7 +16,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return MaterialApp(
       title: 'O-Service Manager App',
       localizationsDelegates: [
@@ -27,12 +26,18 @@ class MyApp extends StatelessWidget {
       supportedLocales: [
         Locale('it'),
       ],
+      color: Colors.orange,
       theme: ThemeData(
         primaryColor: Colors.deepOrangeAccent,
         primarySwatch: Colors.orange,
         fontFamily: 'Montserrat',
         primaryColorDark: Colors.orange,
         primaryColorLight: Colors.indigo.shade800,
+        secondaryHeaderColor: Colors.blueGrey.shade700,
+          colorScheme: Theme.of(context).colorScheme.copyWith(
+            primary: Colors.indigo.shade800,
+            secondary: Colors.indigo.shade800,
+          ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ButtonStyle(
             backgroundColor: WidgetStateProperty.all(Colors.green),

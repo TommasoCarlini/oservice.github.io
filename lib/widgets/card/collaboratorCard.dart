@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:oservice/entities/collaborator.dart';
 import 'package:oservice/widgets/card/collaboratorCardAction.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CollaboratorCard extends StatefulWidget {
   final Function changeTab;
@@ -44,7 +45,7 @@ class _CollaboratorCardState extends State<CollaboratorCard> {
             SizedBox(width: 10),
             widget.collaborator.englishSpeaker
                 ? Icon(
-                    Icons.language_rounded,
+                    Icons.translate_rounded,
                     color: Theme.of(context).primaryColorLight,
                   )
                 : SizedBox(
@@ -59,10 +60,20 @@ class _CollaboratorCardState extends State<CollaboratorCard> {
               children: [
                 Icon(Icons.phone, color: Theme.of(context).primaryColorLight),
                 SizedBox(width: 10),
-                Text(
-                  widget.collaborator.phone,
-                  style: TextStyle(color: Theme.of(context).primaryColorLight),
+                TextButton(
+                  child: Text(
+                    widget.collaborator.phone,
+                    style: TextStyle(color: Theme.of(context).primaryColorLight),
+                  ),
+                  onPressed: () async {
+                    final Uri url = Uri.parse(
+                        'https://api.whatsapp.com/send/?phone=${widget.collaborator.phone.replaceAll(' ', '')}');
+                    if (!await launchUrl(url)) {
+                      throw Exception('Could not launch $url');
+                    }
+                  },
                 ),
+
               ],
             ),
             Row(

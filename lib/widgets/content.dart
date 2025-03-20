@@ -1,9 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:oservice/widgets/screen/addCollaboratorScreen.dart';
-import 'package:oservice/widgets/screen/addExerciseScreen.dart';
-import 'package:oservice/widgets/screen/addLessonScreen.dart';
-import 'package:oservice/widgets/screen/collaboratorScreen.dart';
-import 'package:oservice/widgets/screen/entityScreen.dart';
 import 'package:oservice/widgets/screen/homeScreen.dart';
 
 List<Widget> Contents(BuildContext context, double height, Function changeTab,

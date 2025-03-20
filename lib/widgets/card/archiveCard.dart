@@ -82,56 +82,58 @@ class _ArchiveCardState extends State<ArchiveCard> {
                   child: Icon(Icons.blinds_outlined, color: iconColor),
                 ),
                 SizedBox(width: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "${widget.lesson.title} - ${widget.lesson.entity.name}",
-                      style: TextStyle(
-                        color: Theme.of(context).primaryColorLight,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                SizedBox(
+                  width: 550,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "${widget.lesson.title} - ${widget.lesson.entity.name}",
+                        style: TextStyle(
+                          color: Theme.of(context).primaryColorLight,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    Row(
-                      children: [
-                        Icon(Icons.location_city_rounded,
-                            color: Theme.of(context).primaryColorLight),
-                        TextButton(
-                          child: Text(
-                            widget.lesson.entity.name,
-                            style: TextStyle(
-                                color: Theme.of(context).primaryColorLight),
+                      Row(
+                        children: [
+                          Icon(Icons.location_city_rounded,
+                              color: Theme.of(context).primaryColorLight),
+                          TextButton(
+                            child: Text(
+                              widget.lesson.entity.name,
+                              style: TextStyle(
+                                  color: Theme.of(context).primaryColorLight),
+                            ),
+                            onPressed: () async {},
                           ),
-                          onPressed: () async {},
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Icon(Icons.location_on_rounded,
-                            color: Theme.of(context).primaryColorLight),
-                        TextButton(
-                          child: Text(
-                            '${widget.lesson.location.address} - ${widget.lesson.location.city}',
-                            style: TextStyle(
-                                color: Theme.of(context).primaryColorLight),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Icon(Icons.location_on_rounded,
+                              color: Theme.of(context).primaryColorLight),
+                          TextButton(
+                            child: Text(
+                              '${widget.lesson.location.address} - ${widget.lesson.location.city}',
+                              style: TextStyle(
+                                  color: Theme.of(context).primaryColorLight),
+                            ),
+                            onPressed: () async {
+                              final Uri url =
+                              Uri.parse(widget.lesson.location.href);
+                              if (!await launchUrl(url)) {
+                                throw Exception('Could not launch $url');
+                              }
+                            },
                           ),
-                          onPressed: () async {
-                            final Uri url =
-                            Uri.parse(widget.lesson.location.href);
-                            if (!await launchUrl(url)) {
-                              throw Exception('Could not launch $url');
-                            }
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
-            Spacer(),
             Expanded(
                 child: Column(
                   children: [

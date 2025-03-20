@@ -4,6 +4,8 @@ import 'package:oservice/widgets/screen/addEntityScreen.dart';
 import 'package:oservice/widgets/screen/addExerciseScreen.dart';
 import 'package:oservice/widgets/screen/addLessonScreen.dart';
 import 'package:oservice/widgets/screen/addLocationScreen.dart';
+import 'package:oservice/widgets/screen/addTaxInfoScreen.dart';
+import 'package:oservice/widgets/screen/archiveScreen.dart';
 import 'package:oservice/widgets/screen/collaboratorScreen.dart';
 import 'package:oservice/widgets/screen/entityScreen.dart';
 import 'package:oservice/widgets/screen/exerciseScreen.dart';
@@ -13,7 +15,6 @@ import 'package:oservice/widgets/screen/notificationScreen.dart';
 import 'package:oservice/widgets/screen/paymentsScreen.dart';
 import 'package:oservice/widgets/screen/registrationScreen.dart';
 import 'package:oservice/widgets/screen/settingsScreen.dart';
-import 'package:oservice/widgets/screen/archiveScreen.dart';
 import 'package:oservice/widgets/screen/unpaidScreen.dart';
 
 class Menu {
@@ -40,6 +41,7 @@ class Menu {
       Menu._('Lezioni non convalidate', 13);
   static const Menu PAYMENTS = Menu._('Pagamenti', 14);
   static const Menu NOTIFICATIONS = Menu._('Notifiche', 15);
+  static const Menu TAX_INFO = Menu._('Fatturazione', 16);
 
   static Menu fromIndex(int index) {
     switch (index) {
@@ -75,6 +77,8 @@ class Menu {
         return PAYMENTS;
       case 15:
         return NOTIFICATIONS;
+      case 16:
+        return TAX_INFO;
       default:
         return HOME;
     }
@@ -157,6 +161,11 @@ class Menu {
         );
       case 15:
         return NotificationScreen(
+          changeTab: changeTab,
+          menu: tabController,
+        );
+      case 16:
+        return AddTaxInfoScreen(
           changeTab: changeTab,
           menu: tabController,
         );

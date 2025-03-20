@@ -73,6 +73,11 @@ class _LessonCardActionState extends State<LessonCardAction> {
               onPressed: () async {
                 await FirebaseHelper.removeCollaboratorsLesson(
                     widget.lesson.collaborators, widget.lesson.id);
+                if (widget.lesson.payments != null && widget.lesson.payments!.isNotEmpty) {
+                  for (String paymentId in widget.lesson.payments!.keys) {
+                    await FirebaseHelper.deletePayment(paymentId);
+                  }
+                }
                 Result<String> result =
                     await FirebaseHelper.deleteLesson(widget.lesson.id);
                 Result<String> resultCalendarApi =
