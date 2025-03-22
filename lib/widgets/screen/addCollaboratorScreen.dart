@@ -5,7 +5,11 @@ import 'package:oservice/entities/collaborator.dart';
 import 'package:oservice/entities/collaboratorExtended.dart';
 import 'package:oservice/entities/taxinfo.dart';
 import 'package:oservice/enums/menu.dart';
+import 'package:oservice/enums/months.dart';
 import 'package:oservice/utils/responseHandler.dart';
+import 'dart:typed_data';
+import 'dart:html' as html;
+import 'package:excel/excel.dart';
 
 class AddCollaboratorScreen extends StatefulWidget {
   final Function changeTab;
@@ -73,8 +77,7 @@ class _AddCollaboratorScreenState extends State<AddCollaboratorScreen> {
     setState(() {
       if (isEditMode) {
         _fetchSavedCollaborator();
-      }
-      else {
+      } else {
         isLoading = false;
       }
       this.isEditMode = isEditMode;
@@ -215,6 +218,126 @@ class _AddCollaboratorScreenState extends State<AddCollaboratorScreen> {
         );
       },
     );
+  }
+
+  Map<String, List<List<dynamic>>> extractExcelData(Uint8List fileBytes) {
+    final excel = Excel.decodeBytes(fileBytes);
+    Map<String, List<List<dynamic>>> data = {};
+
+    // Itera sui fogli dell'excel
+    for (final sheetName in excel.tables.keys) {
+      final sheet = excel.tables[sheetName];
+      List<List<dynamic>> sheetData = [];
+      for (final row in sheet!.rows) {
+        // Estrae il valore di ciascuna cella (eventualmente null)
+        List<dynamic> rowData = row.map((cell) => cell?.value).toList();
+        sheetData.add(rowData);
+      }
+      data[sheetName] = sheetData;
+    }
+    return data;
+  }
+
+  Future<void> getInfoFromRow(List<dynamic> row) async {
+    String name = "${row[0]} ${row[1]}";
+    String mail = "";
+    String phone = "";
+    String nickname = "";
+    bool englishSpeaker =
+        row[11].toString().toUpperCase() == 'SI' ? true : false;
+
+    bool isMale(String name) {
+      if (name.toLowerCase() == "andrea" ||
+          name.toLowerCase() == "mattia" ||
+          name.toLowerCase() == "miles") {
+        return true;
+      }
+      return name.split(" ")[0].toLowerCase().endsWith("o") ||
+          name.split(" ")[0].toLowerCase().endsWith("e");
+    }
+
+    String address = "${row[2]}, ${row[3]}";
+    String cap = row[4].toString();
+    String city = row[5].toString();
+    String fiscalCode = row[6].toString();
+    String birthPlace = row[7].toString();
+    String day = (row[8]).toString().split(" ")[0];
+    String dayString = day.length < 2 ? "0$day" : day;
+    int month = Month.fromName((row[8]).toString().split(" ")[1]).number;
+    String monthString = month < 10 ? "0$month" : "$month";
+    String year = (row[8]).toString().split(" ")[2];
+    String birthDate =
+        "$dayString/$monthString/$year";
+    String gender = isMale(name) ? "M" : "F";
+
+    CollaboratorExtended collaborator = CollaboratorExtended(
+      name: name,
+      mail: mail,
+      phone: phone,
+      nickname: nickname,
+      englishSpeaker: englishSpeaker,
+      payments: [],
+      availabilities: [],
+    )
+      ..nickname = nickname
+      ..lessons = [];
+
+    Result<String> result = await firebaseHelper.addCollaborator(collaborator);
+    if (result is Success) {
+      showSuccessSnackbar(name);
+      await FirebaseHelper.setIsCollaboratorSaved(false);
+      String collaboratorId = (result as Success).data;
+      TaxInfo taxInfo = TaxInfo(
+        name: row[1].toString(),
+        surname: row[0].toString(),
+        collaboratorId: collaboratorId,
+        address: address,
+        zipCode: cap,
+        city: city,
+        fiscalCode: fiscalCode,
+        birthPlace: birthPlace,
+        birthDate: birthDate,
+        gender: gender,
+      );
+
+      await firebaseHelper.addTaxInfo(taxInfo);
+    }
+  }
+
+  void pickAndExtractExcelFile() {
+    // Crea un input di tipo file
+    html.FileUploadInputElement uploadInput = html.FileUploadInputElement();
+    uploadInput.accept = '.xlsx'; // Accetta solo file .xlsx
+    uploadInput.click();
+
+    uploadInput.onChange.listen((event) {
+      final files = uploadInput.files;
+      if (files != null && files.isNotEmpty) {
+        final file = files.first;
+        final reader = html.FileReader();
+
+        reader.onLoadEnd.listen((event) {
+          if (reader.result != null) {
+            Uint8List fileBytes = reader.result as Uint8List;
+            Map<String, List<List<dynamic>>> extractedData =
+                extractExcelData(fileBytes);
+
+            extractedData.forEach((sheetName, rows) async {
+              print("Foglio: $sheetName");
+              for (var row in rows) {
+                if (row[0].toString() == "COGNOME") {
+                  continue;
+                }
+                print(row);
+                await getInfoFromRow(row);
+              }
+            });
+          }
+        });
+
+        reader.readAsArrayBuffer(file);
+      }
+    });
   }
 
   @override
@@ -386,6 +509,15 @@ class _AddCollaboratorScreenState extends State<AddCollaboratorScreen> {
                             color: Colors.white),
                       ),
                     ),
+                    // Padding(
+                    //   padding: const EdgeInsets.all(8.0),
+                    //   child: TextButton(
+                    //     child: Text('Importa da Excel'),
+                    //     onPressed: () {
+                    //       pickAndExtractExcelFile();
+                    //     },
+                    //   ),
+                    // ),
                   ],
                 ),
               ),

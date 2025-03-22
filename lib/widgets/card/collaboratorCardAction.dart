@@ -121,7 +121,7 @@ class _CollaboratorCardActionState extends State<CollaboratorCardAction> {
         areTaxIndoComplete ? Container() : Tooltip(
           message: "Aggiungi informazioni di fatturazione",
           child: IconButton(
-            icon: Icon(Icons.recent_actors_rounded, color: Theme.of(context).primaryColorLight),
+            icon: Icon(Icons.info_rounded, color: Theme.of(context).primaryColorLight),
             onPressed: () async {
               await FirebaseHelper.setIdSavedTaxInfo(widget.collaborator.id);
               widget.changeTab(Menu.TAX_INFO.index);

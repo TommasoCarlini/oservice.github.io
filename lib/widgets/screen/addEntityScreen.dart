@@ -115,6 +115,7 @@ class _AddEntityScreenState extends State<AddEntityScreen> {
       secretaryNameController.text = savedEntity.secretary.name;
       secretaryPhoneController.text = savedEntity.secretary.phone;
       secretaryMailController.text = savedEntity.secretary.mail;
+      locationController.text = savedEntity.location.title;
       entityTypeController = savedEntity.type;
       selectedLocation = savedEntity.location;
       selectedColor = fromHex(savedEntity.color);

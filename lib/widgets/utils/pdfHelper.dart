@@ -12,20 +12,20 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
 class PdfHelper {
-  static Future<void> generateCollaboratorPDF(TaxInfo taxInfo,
-      int grossAmount) async {
+  static Future<void> generateCollaboratorPDF(TaxInfo taxInfo, int grossAmount,
+      int numberOfPayments, DateTime paymentDate) async {
     final fontData =
-    await rootBundle.load("assets/fonts/Montserrat/Montserrat-Regular.ttf");
+        await rootBundle.load("assets/fonts/Montserrat/Montserrat-Regular.ttf");
     final ttf = pw.Font.ttf(fontData.buffer.asByteData());
     final fontDataBold =
-    await rootBundle.load("assets/fonts/Montserrat/Montserrat-Bold.ttf");
+        await rootBundle.load("assets/fonts/Montserrat/Montserrat-Bold.ttf");
     final ttfBold = pw.Font.ttf(fontDataBold.buffer.asByteData());
 
     final pdf = pw.Document();
 
     // Utilizza il font personalizzato in tutti gli stili di testo
     final defaultTextStyle =
-    pw.TextStyle(font: ttf, fontFallback: [ttf], fontSize: 12);
+        pw.TextStyle(font: ttf, fontFallback: [ttf], fontSize: 12);
 
     final boldTextStyle = pw.TextStyle(
         font: ttf,
@@ -38,29 +38,19 @@ class PdfHelper {
     final double net = grossAmount - tax;
 
     // Date fisse per l'esempio
-    final String day = DateTime
-        .now()
-        .day
-        .toString();
-    final String month = Month
-        .fromNumber(DateTime
-        .now()
-        .month)
-        .name;
-    final String year = DateTime
-        .now()
-        .year
-        .toString();
+    final String day = DateTime.now().day.toString();
+    final String month = Month.fromNumber(DateTime.now().month).name;
+    final String year = DateTime.now().year.toString();
     String currentDate = "$day $month $year";
+    String paymentDateString =
+        "${paymentDate.day} ${Month.fromNumber(paymentDate.month).name} ${paymentDate.year}";
 
     final String periodDate = "$month $year";
 
     String extractDate(String date) {
       List<String> dateParts = date.split("/");
       String day = dateParts[0];
-      String month = Month
-          .fromNumber(int.parse(dateParts[1]))
-          .name;
+      String month = Month.fromNumber(int.parse(dateParts[1])).name;
       String year = dateParts[2];
       return "$day $month $year";
     }
@@ -69,160 +59,163 @@ class PdfHelper {
       pw.Page(
         build: (pw.Context context) {
           return pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-              pw.Text("Lettere16",
-              style: defaultTextStyle.copyWith(fontSize: 16)),
-          pw.SizedBox(height: 10),
-          pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
-          pw.SizedBox(
-          width: 80,
-          child: pw.Text("NOME:", style: defaultTextStyle),
-          ),
-          pw.Text(taxInfo.name.toUpperCase(), style: boldTextStyle)
-          ]),
-          pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
-          pw.SizedBox(
-          width: 80,
-          child: pw.Text("COGNOME:", style: defaultTextStyle),
-          ),
-          pw.Text(taxInfo.surname.toUpperCase(), style: boldTextStyle)
-          ]),
-          pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
-          pw.SizedBox(
-          width: 80,
-          child: pw.Text("INDIRIZZO:", style: defaultTextStyle),
-          ),
-          pw.Text(taxInfo.address, style: boldTextStyle)
-          ]),
-          pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
-          pw.SizedBox(
-          width: 80,
-          child: pw.Text("CAP:", style: defaultTextStyle),
-          ),
-          pw.Text(taxInfo.zipCode, style: boldTextStyle)
-          ]),
-          pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
-          pw.SizedBox(
-          width: 80,
-          child: pw.Text("CITTÀ:", style: defaultTextStyle),
-          ),
-          pw.Text(taxInfo.city, style: boldTextStyle)
-          ]),
-          pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
-          pw.SizedBox(
-          width: 80,
-          child: pw.Text("C.F.:", style: defaultTextStyle),
-          ),
-          pw.Text(taxInfo.fiscalCode, style: boldTextStyle)
-          ]),
-          pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
-          pw.SizedBox(
-          width: 80,
-          child: pw.Text("NATO/A A:", style: defaultTextStyle),
-          ),
-          pw.Text(taxInfo.birthPlace, style: boldTextStyle)
-          ]),
-          pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
-          pw.SizedBox(
-          width: 80,
-          child: pw.Text("IL:", style: defaultTextStyle),
-          ),
-          pw.Text(extractDate(taxInfo.birthDate), style: boldTextStyle)
-          ]),
-          pw.SizedBox(height: 10),
-          pw.Row(
-          mainAxisAlignment: pw.MainAxisAlignment.end,
-          children: [
-          pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.end,
-          children: [
-          pw.Text("Spett.le", style: defaultTextStyle),
-          pw.SizedBox(height: 5),
-          pw.Text("O-SERVICE S.R.L. (società unipersonale)",
-          style: defaultTextStyle),
-          pw.Text("via LUIGI IAFFEI 11", style: defaultTextStyle),
-          pw.Text("00052 Cerveteri (ROMA)",
-          style: defaultTextStyle),
-          pw.Text("P. IVA/C.F. 17429751005",
-          style: defaultTextStyle),
-          ]),
-          ],
-          ),
-          pw.SizedBox(height: 15),
-          pw.Row(
-          mainAxisAlignment: pw.MainAxisAlignment.start,
-          children: [
-          pw.Text("RICEVUTA DEL: ", style: defaultTextStyle),
-          pw.Text(currentDate, style: boldTextStyle),
-          ],
-          ),
-          pw.SizedBox(height: 15),
-          pw.Row(
-          mainAxisAlignment: pw.MainAxisAlignment.start,
-          children: [
-          pw.Text("Il/La sottoscritto/a       ",
-          style: defaultTextStyle),
-          pw.Text(
-          "${taxInfo.name.toUpperCase()} ${taxInfo.surname.toUpperCase()}",
-          style: boldTextStyle),
-          ],
-          ),
-          pw.Row(
-          mainAxisAlignment: pw.MainAxisAlignment.start,
-          children: [
-          pw.Text("dichiara di ricevere la somma lorda di ",
-          style: defaultTextStyle),
-          pw.Text(grossAmount.toStringAsFixed(2), style: boldTextStyle),
-          pw.Text(
-          " (euro ${digitToText(int.parse(grossAmount.toStringAsFixed(2).split(".").first))}/${grossAmount.toStringAsFixed(2).split(".").last}) per l’attività",
-          style: defaultTextStyle),
-          ],
-          ),
-          pw.Text("occasionale di collaborazione relativa a:",
-          style: defaultTextStyle),
-          pw.Text("Istruttore di Orienteering", style: boldTextStyle),
-          pw.SizedBox(height: 15),
-          pw.Row(
-          mainAxisAlignment: pw.MainAxisAlignment.start,
-          children: [
-          pw.Text("svolta nel periodo:   ", style: defaultTextStyle),
-          pw.Text(periodDate, style: boldTextStyle),
-          ],
-          ),
-          pw.SizedBox(height: 15),
-          pw.Text(
-          "Al suddetto importo lordo andrà detratta ritenuta d'acconto (20%) pari a:",
-          style: defaultTextStyle,
-          ),
-          pw.Row(
-          mainAxisAlignment: pw.MainAxisAlignment.start,
-          children: [
-          pw.Text("euro ${tax.toStringAsFixed(2)} ",
-          style: boldTextStyle),
-          pw.Text(
-          "(euro ${digitToText(int.parse(tax.toStringAsFixed(2).split(".").first))}/${tax.toStringAsFixed(2).split(".").last})",
-          style: defaultTextStyle),
-          ],
-          ),
-          pw.SizedBox(height: 15),
-          pw.Text(
-          "NETTO A PAGARE: euro ${net.toStringAsFixed(2)} (euro ${digitToText(int.parse(net.toStringAsFixed(2).split(".").first))}/${net.toStringAsFixed(2).split(".").last})",
-          style: boldTextStyle),
-          pw.SizedBox(height: 15),
-          pw.Text(
-          "Il/la sottoscritto/a dichiara inoltre sotto la propria responsabilità che la prestazione è stata resa all’azienda in completa autonomia e con carattere del tutto occasionale non svolgendo tale prestazione di lavoro autonomo con carattere di abitualità.",
-          style: defaultTextStyle,
-          ),
-          pw.SizedBox(height: 15),
-          pw.Text(
-          "Il/la sottoscritto/a dichiara altresì di non aver superato la somma di €5000,00 (euro cinquemila/00) per tutte le prestazioni occasioni di qualsiasi natura svolte nell’anno in corso.",
-          style: defaultTextStyle),
-          pw.SizedBox(height: 15),
-          pw.Text("Data: $currentDate", style: defaultTextStyle),
-          pw.SizedBox(height: 20),
-          pw.Text("In fede", style: defaultTextStyle),
-          ],
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
+                pw.SizedBox(
+                  width: 80,
+                  child: pw.Text("NOME:", style: defaultTextStyle),
+                ),
+                pw.Text(taxInfo.name.toUpperCase(), style: boldTextStyle)
+              ]),
+              pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
+                pw.SizedBox(
+                  width: 80,
+                  child: pw.Text("COGNOME:", style: defaultTextStyle),
+                ),
+                pw.Text(taxInfo.surname.toUpperCase(), style: boldTextStyle)
+              ]),
+              pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
+                pw.SizedBox(
+                  width: 80,
+                  child: pw.Text("INDIRIZZO:", style: defaultTextStyle),
+                ),
+                pw.Text(taxInfo.address, style: boldTextStyle)
+              ]),
+              pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
+                pw.SizedBox(
+                  width: 80,
+                  child: pw.Text("CAP:", style: defaultTextStyle),
+                ),
+                pw.Text(taxInfo.zipCode, style: boldTextStyle)
+              ]),
+              pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
+                pw.SizedBox(
+                  width: 80,
+                  child: pw.Text("CITTÀ:", style: defaultTextStyle),
+                ),
+                pw.Text(taxInfo.city, style: boldTextStyle)
+              ]),
+              pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
+                pw.SizedBox(
+                  width: 80,
+                  child: pw.Text("C.F.:", style: defaultTextStyle),
+                ),
+                pw.Text(taxInfo.fiscalCode, style: boldTextStyle)
+              ]),
+              pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
+                pw.SizedBox(
+                  width: 80,
+                  child: pw.Text("NATO/A A:", style: defaultTextStyle),
+                ),
+                pw.Text(taxInfo.birthPlace, style: boldTextStyle)
+              ]),
+              pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
+                pw.SizedBox(
+                  width: 80,
+                  child: pw.Text("IL:", style: defaultTextStyle),
+                ),
+                pw.Text(extractDate(taxInfo.birthDate), style: boldTextStyle)
+              ]),
+              pw.SizedBox(height: 10),
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.end,
+                children: [
+                  pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.end,
+                      children: [
+                        pw.Text("Spett.le", style: defaultTextStyle),
+                        pw.SizedBox(height: 5),
+                        pw.Text("O-SERVICE S.R.L. (società unipersonale)",
+                            style: defaultTextStyle),
+                        pw.Text("via LUIGI IAFFEI 11", style: defaultTextStyle),
+                        pw.Text("00052 Cerveteri (ROMA)",
+                            style: defaultTextStyle),
+                        pw.Text("P. IVA/C.F. 17429751005",
+                            style: defaultTextStyle),
+                      ]),
+                ],
+              ),
+              pw.SizedBox(height: 15),
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.start,
+                children: [
+                  pw.Text("RICEVUTA DEL: ", style: defaultTextStyle),
+                  pw.Text(paymentDateString, style: boldTextStyle),
+                ],
+              ),
+              pw.SizedBox(height: 15),
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.start,
+                children: [
+                  pw.Text("Il/La sottoscritto/a       ",
+                      style: defaultTextStyle),
+                  pw.Text(
+                      "${taxInfo.name.toUpperCase()} ${taxInfo.surname.toUpperCase()}",
+                      style: boldTextStyle),
+                ],
+              ),
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.start,
+                children: [
+                  pw.Text("dichiara di ricevere la somma lorda di ",
+                      style: defaultTextStyle),
+                  pw.Text(grossAmount.toStringAsFixed(2), style: boldTextStyle),
+                  pw.Text(
+                      " (euro ${digitToText(int.parse(grossAmount.toStringAsFixed(2).split(".").first))}/${grossAmount.toStringAsFixed(2).split(".").last}) per l’attività",
+                      style: defaultTextStyle),
+                ],
+              ),
+              pw.Text("occasionale di collaborazione relativa a:",
+                  style: defaultTextStyle),
+              pw.Text("Istruttore di Orienteering", style: boldTextStyle),
+              pw.SizedBox(height: 15),
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.start,
+                children: [
+                  pw.Text("svolta in ", style: defaultTextStyle),
+                  numberOfPayments == 1
+                      ? pw.Text("$numberOfPayments giorno",
+                          style: boldTextStyle)
+                      : pw.Text("$numberOfPayments giorni",
+                          style: boldTextStyle),
+                  pw.Text(" nel periodo:   ", style: defaultTextStyle),
+                  pw.Text(periodDate, style: boldTextStyle),
+                ],
+              ),
+              pw.SizedBox(height: 15),
+              pw.Text(
+                "Al suddetto importo lordo andrà detratta ritenuta d'acconto (20%) pari a:",
+                style: defaultTextStyle,
+              ),
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.start,
+                children: [
+                  pw.Text("euro ${tax.toStringAsFixed(2)} ",
+                      style: boldTextStyle),
+                  pw.Text(
+                      "(euro ${digitToText(int.parse(tax.toStringAsFixed(2).split(".").first))}/${tax.toStringAsFixed(2).split(".").last})",
+                      style: defaultTextStyle),
+                ],
+              ),
+              pw.SizedBox(height: 15),
+              pw.Text(
+                  "NETTO A PAGARE: euro ${net.toStringAsFixed(2)} (euro ${digitToText(int.parse(net.toStringAsFixed(2).split(".").first))}/${net.toStringAsFixed(2).split(".").last})",
+                  style: boldTextStyle),
+              pw.SizedBox(height: 15),
+              pw.Text(
+                "Il/la sottoscritto/a dichiara inoltre sotto la propria responsabilità che la prestazione è stata resa all’azienda in completa autonomia e con carattere del tutto occasionale non svolgendo tale prestazione di lavoro autonomo con carattere di abitualità.",
+                style: defaultTextStyle,
+              ),
+              pw.SizedBox(height: 15),
+              pw.Text(
+                  "Il/la sottoscritto/a dichiara altresì di non aver superato la somma di €5000,00 (euro cinquemila/00) per tutte le prestazioni occasioni di qualsiasi natura svolte nell’anno in corso.",
+                  style: defaultTextStyle),
+              pw.SizedBox(height: 15),
+              pw.Text("Data: $paymentDateString", style: defaultTextStyle),
+              pw.SizedBox(height: 20),
+              pw.Text("In fede", style: defaultTextStyle),
+            ],
           );
         },
       ),
@@ -231,15 +224,12 @@ class PdfHelper {
     showPdf(pdf, "${taxInfo.surname}_payment");
   }
 
-
   static String dateToString(DateTime date) {
-    return "${date.day} ${Month
-        .fromNumber(date.month)
-        .name} ${date.year}";
+    return "${date.day} ${Month.fromNumber(date.month).name} ${date.year}";
   }
 
-  static pw.Widget paymentRow(Payment payment, Lesson lesson,
-      pw.TextStyle defaultTextStyle) {
+  static pw.Widget paymentRow(
+      Payment payment, Lesson lesson, pw.TextStyle defaultTextStyle) {
     return pw.Padding(
       padding: pw.EdgeInsets.symmetric(vertical: 6),
       child: pw.Row(
@@ -274,10 +264,10 @@ class PdfHelper {
   static Future<void> generateSummaryPdf(Collaborator collaborator, Month month,
       int year, List<Payment> payments) async {
     final fontData =
-    await rootBundle.load("assets/fonts/Montserrat/Montserrat-Regular.ttf");
+        await rootBundle.load("assets/fonts/Montserrat/Montserrat-Regular.ttf");
     final ttf = pw.Font.ttf(fontData.buffer.asByteData());
     final fontDataBold =
-    await rootBundle.load("assets/fonts/Montserrat/Montserrat-Bold.ttf");
+        await rootBundle.load("assets/fonts/Montserrat/Montserrat-Bold.ttf");
     final ttfBold = pw.Font.ttf(fontDataBold.buffer.asByteData());
 
     Map<String, Lesson> lessons = await getLessons(payments);
@@ -285,7 +275,7 @@ class PdfHelper {
     final pdf = pw.Document();
 
     final defaultTextStyle =
-    pw.TextStyle(font: ttf, fontFallback: [ttf], fontSize: 12);
+        pw.TextStyle(font: ttf, fontFallback: [ttf], fontSize: 12);
 
     final boldTextStyle = pw.TextStyle(
         font: ttf,
@@ -300,8 +290,7 @@ class PdfHelper {
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
               pw.Text(
-                  "Riepilogo pagamenti di ${collaborator.name} - ${month
-                      .name} $year",
+                  "Riepilogo pagamenti di ${collaborator.name} - ${month.name} $year",
                   style: defaultTextStyle.copyWith(fontSize: 16)),
               pw.SizedBox(height: 40),
               pw.Row(

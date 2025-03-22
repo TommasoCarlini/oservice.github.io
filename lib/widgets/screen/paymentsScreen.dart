@@ -34,8 +34,9 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
 
   Month selectedMonth = Month.getCurrentMonth();
 
-  // Mappa che raggruppa i pagamenti per nome collaboratore
   Map<String, int> paymentsGrouped = {};
+
+  DateTime paymentDate = DateTime.now();
 
   @override
   void initState() {
@@ -354,6 +355,19 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
     );
   }
 
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: paymentDate,
+        firstDate: DateTime(2015, 8),
+        lastDate: DateTime(2101));
+    if (picked != null && picked != paymentDate) {
+      setState(() {
+        paymentDate = picked;
+      });
+    }
+  }
+
   Future<void> generateCollaboratorPdf(
       Collaborator collaborator, int amount) async {
     showWaitSnackbar();
@@ -363,7 +377,12 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
       showTaxInfoIncompleteDialog(collaborator);
       return;
     } else {
-      await PdfHelper.generateCollaboratorPDF(taxInfo, amount);
+      await _selectDate(context);
+      int numberOfPayments = payments
+          .where((element) => element.name == collaborator.name)
+          .length;
+      await PdfHelper.generateCollaboratorPDF(
+          taxInfo, amount, numberOfPayments, paymentDate);
     }
   }
 

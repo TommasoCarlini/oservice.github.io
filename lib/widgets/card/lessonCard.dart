@@ -81,7 +81,7 @@ class _LessonCardState extends State<LessonCard> {
               children: [
                 CircleAvatar(
                   backgroundColor: color,
-                  child: Icon(Icons.blinds_outlined, color: iconColor),
+                  child: Icon(Icons.apartment_rounded, color: iconColor),
                 ),
                 SizedBox(width: 10),
                 SizedBox(
@@ -90,7 +90,7 @@ class _LessonCardState extends State<LessonCard> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "${widget.lesson.title} - ${widget.lesson.entity.name}",
+                        "${widget.lesson.entity.name} - ${widget.lesson.title}",
                         style: TextStyle(
                           color: Theme.of(context).primaryColorLight,
                           fontSize: 18,

@@ -37,7 +37,7 @@ class Month {
   }
 
   static Month fromName(String name) {
-    return values.firstWhere((element) => element.name == name);
+    return values.firstWhere((element) => element.name.toLowerCase() == name.toLowerCase());
   }
 
   @override

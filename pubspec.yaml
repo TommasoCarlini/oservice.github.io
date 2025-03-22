@@ -58,9 +58,10 @@ dependencies:
   extension_google_sign_in_as_googleapis_auth: ^2.0.12
   google_sign_in_web: ^0.12.4+3
   pdf: ^3.11.3
-  printing: ^5.14.2
   number_to_words: ^1.0.0
   flutter_codice_fiscale: ^0.0.3
+  printing: ^5.14.2
+  excel: ^4.0.6
 
 dev_dependencies:
   flutter_test:
@@ -78,7 +79,6 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -158,5 +158,6 @@ flutter:
     # w700 Bold
     # w800 Extra-bold
     # w900 Black, the most thick
+
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package

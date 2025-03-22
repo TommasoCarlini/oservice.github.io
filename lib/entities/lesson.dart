@@ -199,7 +199,7 @@ class Lesson {
     EventReminders reminders = await FirebaseHelper.getEventReminders();
     String prefix = isIncomplete() ? "❌" : "✔";
     return Event()
-      ..summary = "$prefix $title"
+      ..summary = "$prefix ${entity.name} - $title"
       ..description = createDescription()
       ..start = start
       ..end = end
