@@ -149,7 +149,7 @@ flutter:
         - asset: assets/fonts/Montserrat/Montserrat-BlackItalic.ttf
           style: italic
           weight: 900
-    - family: Noto
+    - family: NotoSans
       fonts:
         - asset: assets/fonts/NotoSans/NotoSans-Regular.ttf
         - asset: assets/fonts/NotoSans/NotoSans-Bold.ttf
