@@ -149,12 +149,6 @@ flutter:
         - asset: assets/fonts/Montserrat/Montserrat-BlackItalic.ttf
           style: italic
           weight: 900
-    - family: NotoSans
-      fonts:
-        - asset: assets/fonts/NotoSans/NotoSans-Regular.ttf
-        - asset: assets/fonts/NotoSans/NotoSans-Bold.ttf
-        - asset: assets/fonts/NotoSans/NotoSans-Italic.ttf
-        - asset: assets/fonts/NotoSans/NotoSans-BoldItalic.ttf
 
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
