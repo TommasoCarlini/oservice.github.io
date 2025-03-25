@@ -359,6 +359,17 @@ class FirebaseHelper {
     }
   }
 
+  Future<Result<String>> updateCollaborator(Collaborator collaborator) async {
+    try {
+      CollectionReference<Map<String, dynamic>> collection =
+      db.collection(DbConstants.COLLABORATORS);
+      await collection.doc(collaborator.id).update(collaborator.toMap());
+      return Success(data: collaborator.name);
+    } on Exception catch (e) {
+      return Error(exception: e);
+    }
+  }
+
   Future<Result<String>> addEntity(Entity entity) async {
     try {
       CollectionReference<Map<String, dynamic>> collection =

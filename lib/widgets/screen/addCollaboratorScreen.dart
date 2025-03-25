@@ -118,6 +118,19 @@ class _AddCollaboratorScreenState extends State<AddCollaboratorScreen> {
     );
   }
 
+  void showSuccessUpdateSnackbar(String name) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: Colors.transparent,
+        content: AwesomeSnackbarContent(
+          title: 'Fatto!',
+          message: '$name modificato correttamente!',
+          contentType: ContentType.success,
+        ),
+      ),
+    );
+  }
+
   void showErrorSnackbar(Exception exception) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -187,6 +200,45 @@ class _AddCollaboratorScreenState extends State<AddCollaboratorScreen> {
       showSuccessSnackbar(name);
       await FirebaseHelper.setIsCollaboratorSaved(false);
       changeScreen();
+    } else {
+      showErrorSnackbar((result as Error).exception);
+    }
+  }
+
+  Future<void> updateCollaborator() async {
+    final String name = nameController.text;
+    final String mail = mailController.text;
+    final String phone = phoneController.text;
+    final String nickname =
+    nicknameController.text.isEmpty ? name : nicknameController.text;
+
+    CollaboratorExtended newCollaborator = CollaboratorExtended(
+      name: name,
+      mail: mail.toLowerCase(),
+      phone: phone,
+      nickname: nickname,
+      englishSpeaker: englishSpeakerController,
+      payments: [],
+      availabilities: [],
+    )
+      ..nickname = nickname
+      ..lessons = [];
+
+    setState(() {
+      isLoading = true;
+    });
+    Collaborator oldCollaborator = await FirebaseHelper.getCollaboratorById(
+        await FirebaseHelper.getIdSavedCollaborator());
+    Result<String> result = await firebaseHelper.updateCollaborator(newCollaborator
+      ..id = oldCollaborator.id);
+    setState(() {
+      isLoading = false;
+    });
+
+    if (result is Success) {
+      await FirebaseHelper.setIsCollaboratorSaved(false);
+      showSuccessUpdateSnackbar(nameController.text);
+      widget.changeTab(Menu.COLLABORATORI.index);
     } else {
       showErrorSnackbar((result as Error).exception);
     }
@@ -500,8 +552,14 @@ class _AddCollaboratorScreenState extends State<AddCollaboratorScreen> {
                           borderRadius: BorderRadius.circular(16),
                         ),
                       ),
-                      onPressed: addCollaborator,
-                      child: Text(
+                      onPressed: isEditMode ? updateCollaborator : addCollaborator,
+                      child: isEditMode ? Text(
+                        'Salva le modifiche',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Montserrat',
+                            color: Colors.white),
+                      ) : Text(
                         'Aggiungi collaboratore',
                         style: TextStyle(
                             fontWeight: FontWeight.bold,

@@ -1,4 +1,3 @@
-
 import 'dart:collection';
 
 import 'package:googleapis/calendar/v3.dart';
@@ -80,8 +79,7 @@ class Lesson {
   String? getResponsibleId() {
     try {
       return responsible?.id;
-    }
-    catch(e) {
+    } catch (e) {
       return null;
     }
   }
@@ -109,7 +107,6 @@ class Lesson {
       print("Errore durante l'aggiunta dell'id evento: $e");
     }
   }
-
 
   void addEntity(Entity entity) {
     try {
@@ -203,21 +200,20 @@ class Lesson {
       ..description = createDescription()
       ..start = start
       ..end = end
-      ..location = location.href
+      ..location =
+          "${location.coordinates.latitude}, ${location.coordinates.longitude}"
       ..reminders = reminders
       ..attendees = collaborators.map((c) {
         return EventAttendee()..email = c.mail;
-      }).toList() as List<EventAttendee>?
-    ;
+      }).toList() as List<EventAttendee>?;
   }
 
   String createDescription() {
     return "${buildReferenceText()}"
-    "${buildCollaboratorsText()}"
-    "${buildExercisesText()}"
-    "${buildParticipantsText()}"
-    "${buildNotesText()}"
-    ;
+        "${buildCollaboratorsText()}"
+        "${buildExercisesText()}"
+        "${buildParticipantsText()}"
+        "${buildNotesText()}";
   }
 
   String buildReferenceText() {
@@ -237,13 +233,13 @@ class Lesson {
       }
       if (responsible != null) {
         List<Collaborator> collaboratorsTemp = collaborators.toList();
-        collaboratorsTemp.removeWhere((element) => element.name == responsible?.name);
+        collaboratorsTemp
+            .removeWhere((element) => element.name == responsible?.name);
         return "Collaboratori:\n - ${responsible?.name} (Resp.),\n - ${collaboratorsTemp.map((e) => e.name).join(",\n - ")}\n\n";
       } else {
         return "Collaboratori:\n - ${collaborators.map((e) => e.name).join(",\n - ")}\n\n";
       }
-    }
-    catch (e) {
+    } catch (e) {
       return "Collaboratori:\n - ${collaborators.map((e) => e.name).join(",\n - ")}\n\n";
     }
   }

@@ -23,6 +23,10 @@ const RESOURCES = {"assets/AssetManifest.bin": "40bfb9d5668cdd8df8a4440628650ad6
 "assets/assets/fonts/Montserrat/Montserrat-SemiBoldItalic.ttf": "75c4176c64611f32faf01a5de7631877",
 "assets/assets/fonts/Montserrat/Montserrat-Thin.ttf": "b3638b16904211d1d24d04ce53810c4d",
 "assets/assets/fonts/Montserrat/Montserrat-ThinItalic.ttf": "ff9c45e92d16324b8964447d12d1f458",
+"assets/assets/fonts/NotoSans/NotoSans-Bold.ttf": "2ea5e0855d5a3ec3f561b5bc62b39805",
+"assets/assets/fonts/NotoSans/NotoSans-BoldItalic.ttf": "4321108b0cf255575499e2361b6501e0",
+"assets/assets/fonts/NotoSans/NotoSans-Italic.ttf": "a6d070775dd5e6bfff61870528c6248a",
+"assets/assets/fonts/NotoSans/NotoSans-Regular.ttf": "f46b08cc90d994b34b647ae24c46d504",
 "assets/assets/images/topographic_background.jpg": "9d0e516e26767079458a90987b481e7b",
 "assets/FontManifest.json": "77d5efada82914643bf2ccdb8abaae02",
 "assets/fonts/MaterialIcons-Regular.otf": "34321aaf71cb0a23259e71bf7ef51844",
@@ -60,7 +64,7 @@ const RESOURCES = {"assets/AssetManifest.bin": "40bfb9d5668cdd8df8a4440628650ad6
 "/": "8e0b09fb99aa8f3609b7c38349e8e4d4",
 "main.dart.js": "e5291290ff07eb09acb1aea194bbef2b",
 "manifest.json": "f856618bb7f8fea405d321c65cbe6520",
-"version.json": "b2a71ff1d7302c3323e8b8a390f81a07"};
+"version.json": "2656dad41434aeb42a64b446a9cdf4a6"};
 // The application shell files that are downloaded before a service worker can
 // start.
 const CORE = ["main.dart.js",

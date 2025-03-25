@@ -194,7 +194,7 @@ class _AddLessonScreenState extends State<AddLessonScreen> {
       } else if (isSaved) {
         _fetchSavedLesson();
       }
-      this.isEditMode = isEditMode || isSaved;
+      this.isEditMode = isEditMode;
     });
   }
 

@@ -31,11 +31,20 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     firebaseHelper = FirebaseHelper.initialize();
     _loadLessons();
+    _initializeVariables();
+  }
+
+  Future<void> _initializeVariables() async {
+    await FirebaseHelper.setIsLessonEditing(false);
+    await FirebaseHelper.setIsCollaboratorSaved(false);
+    await FirebaseHelper.setIsLocationSaved(false);
+    await FirebaseHelper.setIsExerciseSaved(false);
+    await FirebaseHelper.setIsLessonSaved(false);
+    await FirebaseHelper.setIsEntitySaved(false);
   }
 
   Future<void> _loadLessons() async {
     try {
-      await FirebaseHelper.setIsLessonEditing(false);
       lessons = await FirebaseHelper.getAllLessons();
       lessons.sort((a, b) => a.startDate.compareTo(b.startDate));
       incompleteLessons = lessons

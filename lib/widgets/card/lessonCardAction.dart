@@ -71,6 +71,7 @@ class _LessonCardActionState extends State<LessonCardAction> {
             ),
             TextButton(
               onPressed: () async {
+                Navigator.of(context).pop();
                 await FirebaseHelper.removeCollaboratorsLesson(
                     widget.lesson.collaborators, widget.lesson.id);
                 if (widget.lesson.payments != null && widget.lesson.payments!.isNotEmpty) {
@@ -84,7 +85,6 @@ class _LessonCardActionState extends State<LessonCardAction> {
                     await CalendarClient.deleteEvent(
                         widget.lesson.entity.calendarId, widget.lesson.eventId);
                 await widget.refreshLessons();
-                Navigator.of(context).pop();
                 if (result is Success && resultCalendarApi is Success) {
                   showSuccessSnackbar(widget.lesson.title);
                 } else {
