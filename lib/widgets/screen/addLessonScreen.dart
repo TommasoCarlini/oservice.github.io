@@ -41,7 +41,7 @@ class _AddLessonScreenState extends State<AddLessonScreen> {
   final TextEditingController exerciseController = TextEditingController();
   final TextEditingController collaboratorsController = TextEditingController();
   final TextEditingController collaboratorsNeededController =
-      TextEditingController();
+  TextEditingController();
   final TextEditingController responsibleCollaborator = TextEditingController();
   final TextEditingController salaryController = TextEditingController();
   final TextEditingController participantsController = TextEditingController();
@@ -150,7 +150,7 @@ class _AddLessonScreenState extends State<AddLessonScreen> {
   Future<void> _fetchCollaborators() async {
     try {
       List<Collaborator> collaborators =
-          await FirebaseHelper.getAllCollaborators();
+      await FirebaseHelper.getAllCollaborators();
       collaborators.sort((a, b) => a.name.compareTo(b.name));
       setState(() {
         allCollaborators = collaborators;
@@ -234,7 +234,7 @@ class _AddLessonScreenState extends State<AddLessonScreen> {
     });
     CalendarApi.Event event = await newLesson.mapToEvent();
     Result<String> calendarApiResult =
-        await CalendarClient.addEvent(event, newLesson.entity.calendarId);
+    await CalendarClient.addEvent(event, newLesson.entity.calendarId);
     Result<String> result = await firebaseHelper.addLesson(newLesson
       ..eventId = (calendarApiResult as Success).data
       ..isInCalendar = true);
@@ -284,9 +284,9 @@ class _AddLessonScreenState extends State<AddLessonScreen> {
     Result<String> calendarApiResult;
     if (newLesson.entity.id != savedLesson.entity.id) {
       calendarApiResult = await CalendarClient.deleteEvent(
-          savedLesson.entity.calendarId, savedLesson.eventId!);
+          savedLesson.entity.calendarId, savedLesson.eventId);
       calendarApiResult =
-          await CalendarClient.addEvent(event, newLesson.entity.calendarId);
+      await CalendarClient.addEvent(event, newLesson.entity.calendarId);
     } else {
       calendarApiResult = await CalendarClient.updateEvent(
           event, newLesson.entity.calendarId, event.id!);
@@ -433,15 +433,15 @@ class _AddLessonScreenState extends State<AddLessonScreen> {
             isEditMode
                 ? SizedBox()
                 : TextButton(
-                    onPressed: () async {
-                      await saveLesson();
-                      Navigator.of(context).pop();
-                      widget.changeTab(Menu.HOME.index);
-                    },
-                    child: Text(
-                      'Salva ed esci',
-                    ),
-                  ),
+              onPressed: () async {
+                await saveLesson();
+                Navigator.of(context).pop();
+                widget.changeTab(Menu.HOME.index);
+              },
+              child: Text(
+                'Salva ed esci',
+              ),
+            ),
             TextButton(
               onPressed: () async {
                 await FirebaseHelper.setIsLessonSaved(false);
@@ -470,13 +470,13 @@ class _AddLessonScreenState extends State<AddLessonScreen> {
 
     bool isCollaboratorInList(Collaborator collaborator) {
       return chosenCollaborators.any(
-        (element) => element.name == collaborator.name,
+            (element) => element.name == collaborator.name,
       );
     }
 
     bool isExerciseInList(Exercise exercise) {
       return chosenExercises.any(
-        (element) => element.title == exercise.title,
+            (element) => element.title == exercise.title,
       );
     }
 
@@ -566,7 +566,7 @@ class _AddLessonScreenState extends State<AddLessonScreen> {
                     child: CheckboxListTile(
                       title: Text('Campo scuola',
                           style:
-                              Theme.of(context).primaryTextTheme.labelMedium),
+                          Theme.of(context).primaryTextTheme.labelMedium),
                       value: schoolCampController,
                       controlAffinity: ListTileControlAffinity.leading,
                       contentPadding: EdgeInsets.symmetric(horizontal: 10),
@@ -657,7 +657,7 @@ class _AddLessonScreenState extends State<AddLessonScreen> {
                     child: CheckboxListTile(
                       title: Text('Devono parlare inglese',
                           style:
-                              Theme.of(context).primaryTextTheme.labelMedium),
+                          Theme.of(context).primaryTextTheme.labelMedium),
                       value: englishSpeakerController,
                       controlAffinity: ListTileControlAffinity.leading,
                       contentPadding: EdgeInsets.symmetric(horizontal: 10),
@@ -699,21 +699,21 @@ class _AddLessonScreenState extends State<AddLessonScreen> {
                       },
                       icon: showCollaborators
                           ? Icon(
-                              Icons.visibility_rounded,
-                              size: 18,
-                              color: Theme.of(context).primaryColorLight,
-                            )
+                        Icons.visibility_rounded,
+                        size: 18,
+                        color: Theme.of(context).primaryColorLight,
+                      )
                           : Icon(
-                              Icons.visibility_off_rounded,
-                              size: 18,
-                              color: Theme.of(context).primaryColorLight,
-                            )),
+                        Icons.visibility_off_rounded,
+                        size: 18,
+                        color: Theme.of(context).primaryColorLight,
+                      )),
                   SizedBox(width: 10),
                   Text(
                       showCollaborators
                           ? chosenCollaborators.map((collaborator) {
-                              return collaborator.name;
-                            }).join(', ')
+                        return collaborator.name;
+                      }).join(', ')
                           : '',
                       style: Theme.of(context).primaryTextTheme.labelMedium),
                 ],
@@ -735,7 +735,7 @@ class _AddLessonScreenState extends State<AddLessonScreen> {
                         if (collaborator != null) {
                           if (isCollaboratorInList(collaborator)) {
                             chosenCollaborators.removeWhere(
-                                (element) => element.name == collaborator.name);
+                                    (element) => element.name == collaborator.name);
                             if (responsibleCollaborator.text ==
                                 collaborator.name) {
                               responsibleCollaborator.clear();
@@ -767,7 +767,7 @@ class _AddLessonScreenState extends State<AddLessonScreen> {
                     controller: responsibleCollaborator,
                     enableFilter: true,
                     dropdownMenuEntries:
-                        chosenCollaborators.map((collaborator) {
+                    chosenCollaborators.map((collaborator) {
                       return DropdownMenuEntry<Collaborator>(
                         value: collaborator,
                         label: collaborator.name,
@@ -795,8 +795,8 @@ class _AddLessonScreenState extends State<AddLessonScreen> {
                       chosenExercises.isEmpty
                           ? 'Nessun esercizio selezionato'
                           : 'Esercizi:  ${chosenExercises.map((exercise) {
-                              return exercise.title;
-                            }).join(', ')}',
+                        return exercise.title;
+                      }).join(', ')}',
                       style: Theme.of(context).primaryTextTheme.labelMedium),
                 ],
               ),
@@ -817,7 +817,7 @@ class _AddLessonScreenState extends State<AddLessonScreen> {
                         if (exercise != null) {
                           if (isExerciseInList(exercise)) {
                             chosenExercises.removeWhere(
-                                (element) => element.title == exercise.title);
+                                    (element) => element.title == exercise.title);
                           } else {
                             chosenExercises.add(exercise);
                           }
@@ -850,7 +850,7 @@ class _AddLessonScreenState extends State<AddLessonScreen> {
                         backgroundColor: Colors.red.shade700,
                         surfaceTintColor: Colors.blue.shade900,
                         padding:
-                            EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                        EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
@@ -872,7 +872,7 @@ class _AddLessonScreenState extends State<AddLessonScreen> {
                         backgroundColor: Colors.green.shade700,
                         textStyle: TextStyle(color: Colors.white),
                         padding:
-                            EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                        EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),

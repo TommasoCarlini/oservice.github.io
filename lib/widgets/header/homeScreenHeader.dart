@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-PreferredSizeWidget HomeScreenHeader(double width, bool isColabComplete, Function showOnlyColab) {
+PreferredSizeWidget HomeScreenHeader(double width, bool isColabComplete,
+    Function showOnlyColab, Function loadMoreLessons) {
   return AppBar(
       backgroundColor: Colors.transparent,
       surfaceTintColor: Colors.transparent,
@@ -14,6 +15,22 @@ PreferredSizeWidget HomeScreenHeader(double width, bool isColabComplete, Functio
       title: Row(
         // input text for search
         children: [
+          SizedBox(
+              width: 250,
+              child: TextButton(
+                  onPressed: () => loadMoreLessons(),
+                  child: Text(
+                    "Carica altri 7 giorni",
+                    style: TextStyle(
+                      decoration: TextDecoration.underline,
+                      fontWeight: FontWeight.bold,
+                      fontStyle: FontStyle.italic,
+                      fontSize: 18,
+                    ),
+                  ))),
+          SizedBox(
+            width: 20,
+          ),
           Expanded(
             child: TextField(
               decoration: InputDecoration(
@@ -40,7 +57,9 @@ PreferredSizeWidget HomeScreenHeader(double width, bool isColabComplete, Functio
             width: 20,
           ),
           Tooltip(
-            message: isColabComplete ? "Mostra tutti gli eventi" : "Mostra eventi senza collaboratori",
+            message: isColabComplete
+                ? "Mostra tutti gli eventi"
+                : "Mostra eventi senza collaboratori",
             child: Switch(
               onChanged: (bool value) {
                 showOnlyColab(value);
