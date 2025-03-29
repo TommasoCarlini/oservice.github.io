@@ -31,6 +31,7 @@ class DbConstants {
 
   static const String DAYS_BEFORE = 'numberOfDaysBeforeToBeVisualized';
   static const String NEW_EVENT_NOTIFICATION = 'newEventNotification';
+  static const String UPDATE_EVENT_NOTIFICATION = 'updateEventNotification';
   static const String DELETED_EVENT_NOTIFICATION = 'deletedEventNotification';
   static const String EVENT_REMINDERS = 'eventReminders';
   static const String PAYRATE_DEFAULT = 'payrate';

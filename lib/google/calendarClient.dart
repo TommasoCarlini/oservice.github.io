@@ -40,7 +40,7 @@ class CalendarClient {
       final CalendarApi calendarApi = CalendarApi(client as http.Client);
       Calendar createdCalendar = await calendarApi.calendars.insert(calendar);
       CalendarListEntry calendarListEntry =
-          await calendarApi.calendarList.get(createdCalendar.id!);
+      await calendarApi.calendarList.get(createdCalendar.id!);
       calendarListEntry.backgroundColor = color;
       await calendarApi.calendarList
           .update(calendarListEntry, createdCalendar.id!, colorRgbFormat: true);
@@ -57,9 +57,9 @@ class CalendarClient {
       final client = await _googleSignIn.authenticatedClient();
       final CalendarApi calendarApi = CalendarApi(client as http.Client);
       Calendar updatedCalendar =
-          await calendarApi.calendars.update(calendar, calendarId);
+      await calendarApi.calendars.update(calendar, calendarId);
       CalendarListEntry calendarListEntry =
-          await calendarApi.calendarList.get(updatedCalendar.id!);
+      await calendarApi.calendarList.get(updatedCalendar.id!);
       calendarListEntry.backgroundColor = color;
       await calendarApi.calendarList
           .update(calendarListEntry, updatedCalendar.id!, colorRgbFormat: true);
@@ -104,7 +104,8 @@ class CalendarClient {
       await _googleSignIn.signIn();
       final client = await _googleSignIn.authenticatedClient();
       final CalendarApi calendarApi = CalendarApi(client as http.Client);
-      await calendarApi.events.update(event, calendarId, eventId);
+      bool sendNotification = await FirebaseHelper.getUpdateEventNotification();
+      await calendarApi.events.update(event, calendarId, eventId, sendNotifications: sendNotification);
       return ResponseHandler.Success(data: eventId);
     } on Exception catch (e) {
       print("Errore durante l'aggiornamento dell'evento: $e");
@@ -118,7 +119,8 @@ class CalendarClient {
       await _googleSignIn.signIn();
       final client = await _googleSignIn.authenticatedClient();
       final CalendarApi calendarApi = CalendarApi(client as http.Client);
-      await calendarApi.events.delete(calendarId, eventId);
+      bool sendNotification = await FirebaseHelper.getDeletedEventNotification();
+      await calendarApi.events.delete(calendarId, eventId, sendNotifications: sendNotification);
       return ResponseHandler.Success(data: eventId);
     } on Exception catch (e) {
       print("Errore durante l'eliminazione dell'evento: $e");
