@@ -36,6 +36,7 @@ class _LocationScreenState extends State<LocationScreen> {
   Future<void> _loadEntities() async {
     try {
       locationList = await FirebaseHelper.getAllLocations();
+      locationList.sort((a, b) => a.title.compareTo(b.title));
     } catch (e) {
       print("Errore durante il caricamento dei luoghi: $e");
     } finally {

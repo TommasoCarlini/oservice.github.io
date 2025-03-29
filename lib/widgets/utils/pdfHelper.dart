@@ -23,7 +23,6 @@ class PdfHelper {
 
     final pdf = pw.Document();
 
-    // Utilizza il font personalizzato in tutti gli stili di testo
     final defaultTextStyle =
         pw.TextStyle(font: ttf, fontFallback: [ttf], fontSize: 12);
 
@@ -185,7 +184,7 @@ class PdfHelper {
               ),
               pw.SizedBox(height: 15),
               pw.Text(
-                "Al suddetto importo lordo andrà detratta ritenuta d'acconto (20%) pari a:",
+                "Al suddetto importo lordo è stata detratta ritenuta d'acconto (20%) pari a:",
                 style: defaultTextStyle,
               ),
               pw.Row(
@@ -200,7 +199,7 @@ class PdfHelper {
               ),
               pw.SizedBox(height: 15),
               pw.Text(
-                  "NETTO A PAGARE: euro ${net.toStringAsFixed(2)} (euro ${digitToText(int.parse(net.toStringAsFixed(2).split(".").first))}/${net.toStringAsFixed(2).split(".").last})",
+                  "NETTO RICEVUTO: euro ${net.toStringAsFixed(2)} (euro ${digitToText(int.parse(net.toStringAsFixed(2).split(".").first))}/${net.toStringAsFixed(2).split(".").last})",
                   style: boldTextStyle),
               pw.SizedBox(height: 15),
               pw.Text(

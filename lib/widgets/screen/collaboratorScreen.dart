@@ -37,6 +37,7 @@ class _CollaboratorScreenState extends State<CollaboratorScreen> {
   Future<void> _loadCollaborators() async {
     try {
       collaboratorList = await FirebaseHelper.getAllCollaborators();
+      collaboratorList.sort((a, b) => a.name.compareTo(b.name));
     } catch (e) {
       print("Errore durante il caricamento dei collaboratori: $e");
     } finally {

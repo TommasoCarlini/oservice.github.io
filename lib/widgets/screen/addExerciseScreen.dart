@@ -27,6 +27,8 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
   final TextEditingController typeController = TextEditingController();
   final List<TextEditingController> materialControllers = [];
 
+  ExerciseType? selectedType;
+
   bool isEditMode = false;
 
   @override
@@ -48,7 +50,7 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
   }
 
   Future<void> _fetchIsEditMode() async {
-    bool isEditMode = await FirebaseHelper.getIsEditCollaboratorMode();
+    bool isEditMode = await FirebaseHelper.getIsEditExerciseMode();
     setState(() {
       if (isEditMode) {
         _fetchSavedExercise();
@@ -61,7 +63,7 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
     setState(() {
       titleController.text = savedExercise.title;
       descriptionController.text = savedExercise.description;
-      typeController.text = savedExercise.type.toString();
+      typeController.text = savedExercise.type.type;
       for (var material in savedExercise.material) {
         materialControllers.add(TextEditingController(text: material));
       }
@@ -136,6 +138,30 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
     );
 
     Result<String> result = await firebaseHelper.addExercise(exercise);
+
+    if (result is Success) {
+      showSuccessSnackbar(title);
+      changeScreen();
+    } else {
+      showErrorSnackbar((result as Error).exception);
+    }
+  }
+
+  Future<void> updateExercise() async {
+    final String title = titleController.text;
+    final String description = descriptionController.text;
+    final ExerciseType type = ExerciseType.fromString(typeController.text);
+    final List<String> materials =
+        materialControllers.map((e) => e.text).toList();
+
+    Exercise exercise = Exercise(
+      title: title,
+      description: description,
+      type: type,
+      material: materials,
+    );
+
+    Result<String> result = await firebaseHelper.updateExercise(exercise);
 
     if (result is Success) {
       showSuccessSnackbar(title);
@@ -325,10 +351,14 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
                         ),
                       ),
                       onPressed: () {
-                        addExercise();
+                        isEditMode
+                            ? updateExercise()
+                            : addExercise();
                       },
                       child: Text(
-                        'Aggiungi esercizio',
+                        isEditMode
+                            ? 'Modifica esercizio'
+                            : 'Aggiungi esercizio',
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontFamily: 'Montserrat',

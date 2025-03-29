@@ -391,6 +391,17 @@ class FirebaseHelper {
     }
   }
 
+  Future<Result<String>> updateExercise(Exercise exercise) async {
+    try {
+      CollectionReference<Map<String, dynamic>> collection =
+      db.collection(DbConstants.EXERCISES);
+      await collection.doc(exercise.id).update(exercise.toMap());
+      return Success(data: exercise.title);
+    } on Exception catch (e) {
+      return Error(exception: e);
+    }
+  }
+
   Future<Result<String>> addCollaborator(Collaborator collaborator) async {
     try {
       CollectionReference<Map<String, dynamic>> collection =

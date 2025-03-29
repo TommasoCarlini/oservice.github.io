@@ -210,8 +210,6 @@ class _AddLessonScreenState extends State<AddLessonScreen> {
   }
 
   Future<void> addLesson() async {
-    print(startDate);
-    print(endDate);
     Lesson newLesson = Lesson(
       title: titleController.text,
       description: notesController.text,

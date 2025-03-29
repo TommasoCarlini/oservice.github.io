@@ -200,8 +200,9 @@ class Lesson {
       ..description = createDescription()
       ..start = start
       ..end = end
-      ..location =
-          "${location.coordinates.latitude}, ${location.coordinates.longitude}"
+      ..location = location.href
+      // ..location =
+      //     "${location.coordinates.latitude}, ${location.coordinates.longitude}"
       ..reminders = reminders
       ..attendees = collaborators.map((c) {
         return EventAttendee()..email = c.mail;

@@ -80,7 +80,7 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
         backgroundColor: Colors.transparent,
         content: AwesomeSnackbarContent(
           title: 'Fatto!',
-          message: '$name aggiuna alle posizioni!',
+          message: '$name aggiunta alle posizioni!',
           contentType: ContentType.success,
         ),
       ),
