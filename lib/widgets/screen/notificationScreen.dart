@@ -392,7 +392,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
               Row(
                 children: [
                   _settingHeader("Notifica eventi",
-                      "Attiva o disattiva le notifiche per la creazione, la modifica e l'eliminazione di un evento"),
+                      "Attiva o disattiva le notifiche per la creazione e l'eliminazione di un evento"),
                   SizedBox(
                     width: 20,
                   ),
@@ -417,31 +417,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     newEventNotification
                         ? "Notifica nuovo\nevento: ATTIVA"
                         : "Notifica nuovo\nevento: NON ATTIVA",
-                    style: TextStyle(
-                      color: Theme.of(context).primaryColorLight,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(
-                    width: 40,
-                  ),
-                  Switch(
-                    value: updateEventNotification,
-                    activeColor: Colors.green,
-                    onChanged: (bool value) {
-                      setState(() {
-                        updateEventNotification = value;
-                      });
-                    },
-                  ),
-                  SizedBox(
-                    width: 8,
-                  ),
-                  Text(
-                    updateEventNotification
-                        ? "Notifica modifica\nevento: ATTIVA"
-                        : "Notifica modifica\nevento: NON ATTIVA",
                     style: TextStyle(
                       color: Theme.of(context).primaryColorLight,
                       fontSize: 16,

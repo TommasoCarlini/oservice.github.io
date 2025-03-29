@@ -99,12 +99,11 @@ class CalendarClient {
   }
 
   static Future<ResponseHandler.Result<String>> updateEvent(
-      Event event, String calendarId, String eventId) async {
+      Event event, String calendarId, String eventId, bool sendNotification) async {
     try {
       await _googleSignIn.signIn();
       final client = await _googleSignIn.authenticatedClient();
       final CalendarApi calendarApi = CalendarApi(client as http.Client);
-      bool sendNotification = await FirebaseHelper.getUpdateEventNotification();
       await calendarApi.events.update(event, calendarId, eventId, sendNotifications: sendNotification);
       return ResponseHandler.Success(data: eventId);
     } on Exception catch (e) {

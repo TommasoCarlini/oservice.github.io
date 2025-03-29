@@ -35,6 +35,7 @@ class _EntityScreenState extends State<EntityScreen> {
   Future<void> _loadEntities() async {
     try {
       entityList = await FirebaseHelper.getAllEntities();
+      entityList.sort((a, b) => a.name.compareTo(b.name));
     } catch (e) {
       print("Errore durante il caricamento degli enti: $e");
     } finally {

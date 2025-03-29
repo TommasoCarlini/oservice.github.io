@@ -253,7 +253,7 @@ class _AddLessonScreenState extends State<AddLessonScreen> {
     }
   }
 
-  Future<void> updateLesson() async {
+  Future<void> updateLesson(bool sendNotification) async {
     Lesson newLesson = Lesson(
       title: titleController.text,
       description: notesController.text,
@@ -289,7 +289,7 @@ class _AddLessonScreenState extends State<AddLessonScreen> {
       await CalendarClient.addEvent(event, newLesson.entity.calendarId);
     } else {
       calendarApiResult = await CalendarClient.updateEvent(
-          event, newLesson.entity.calendarId, event.id!);
+          event, newLesson.entity.calendarId, event.id!, sendNotification);
     }
     Result<String> result = await firebaseHelper.updateLesson(newLesson
       ..eventId = (calendarApiResult as Success).data
@@ -878,7 +878,7 @@ class _AddLessonScreenState extends State<AddLessonScreen> {
                         ),
                       ),
                       onPressed: () {
-                        isEditMode ? updateLesson() : addLesson();
+                        isEditMode ? updateLesson(false) : addLesson();
                       },
                       child: Text(
                         isEditMode ? "Salva le modifiche" : "Aggiungi lezione",
@@ -888,6 +888,32 @@ class _AddLessonScreenState extends State<AddLessonScreen> {
                             color: Colors.white),
                       ),
                     ),
+                    isEditMode ?
+                    SizedBox(width: 20) :
+                    SizedBox(width: 0,),
+                    isEditMode ?
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green.shade700,
+                        textStyle: TextStyle(color: Colors.white),
+                        padding:
+                        EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      onPressed: () {
+                        updateLesson(true);
+                      },
+                      child: Text(
+                        "Salva e invia notifica",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Montserrat',
+                            color: Colors.white),
+                      ),
+                    ) :
+                    SizedBox(width: 0,),
                   ],
                 ),
               ),

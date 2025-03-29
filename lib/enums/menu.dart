@@ -27,7 +27,7 @@ class Menu {
   static const Menu ENTI = Menu._('Enti', 1);
   static const Menu COLLABORATORI = Menu._('Collaboratori', 2);
   static const Menu ARCHIVIO = Menu._('Archivio', 3);
-  static const Menu IMPOSTAZIONI = Menu._('Impotazioni', 4);
+  static const Menu IMPOSTAZIONI = Menu._('Impostazioni', 4);
   static const Menu AGGIUNGI_LEZIONE = Menu._('Aggiungi una lezione', 5);
   static const Menu AGGIUNGI_ENTE = Menu._('Aggiungi un ente', 6);
   static const Menu AGGIUNGI_COLLABORATORE =
