@@ -135,6 +135,19 @@ class _AddEntityScreenState extends State<AddEntityScreen> {
     );
   }
 
+  void showSuccessUpdateSnackbar(String name) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: Colors.transparent,
+        content: AwesomeSnackbarContent(
+          title: 'Fatto!',
+          message: '$name modificato!',
+          contentType: ContentType.success,
+        ),
+      ),
+    );
+  }
+
   void showErrorSnackbar(Exception exception) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -256,7 +269,7 @@ class _AddEntityScreenState extends State<AddEntityScreen> {
     });
 
     if (result is Success) {
-      showSuccessSnackbar(nameController.text);
+      showSuccessUpdateSnackbar(nameController.text);
       widget.changeTab(Menu.ENTI.index);
     } else {
       showErrorSnackbar((result as Error).exception);

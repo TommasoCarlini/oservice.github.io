@@ -110,6 +110,19 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
     );
   }
 
+  void showSuccessUpdateSnackbar(String title) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: Colors.transparent,
+        content: AwesomeSnackbarContent(
+          title: 'Fatto!',
+          message: '$title modificat!',
+          contentType: ContentType.success,
+        ),
+      ),
+    );
+  }
+
   void showErrorSnackbar(Exception exception) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -161,10 +174,11 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
       material: materials,
     );
 
-    Result<String> result = await firebaseHelper.updateExercise(exercise);
+    String exerciseId = await FirebaseHelper.getIdSavedExercise();
+    Result<String> result = await firebaseHelper.updateExercise(exercise..id = exerciseId);
 
     if (result is Success) {
-      showSuccessSnackbar(title);
+      showSuccessUpdateSnackbar(title);
       changeScreen();
     } else {
       showErrorSnackbar((result as Error).exception);
@@ -351,9 +365,7 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
                         ),
                       ),
                       onPressed: () {
-                        isEditMode
-                            ? updateExercise()
-                            : addExercise();
+                        isEditMode ? updateExercise() : addExercise();
                       },
                       child: Text(
                         isEditMode
