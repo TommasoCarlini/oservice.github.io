@@ -284,7 +284,7 @@ class _AddLessonScreenState extends State<AddLessonScreen> {
     Result<String> calendarApiResult;
     if (newLesson.entity.id != savedLesson.entity.id) {
       calendarApiResult = await CalendarClient.deleteEvent(
-          savedLesson.entity.calendarId, savedLesson.eventId);
+          savedLesson.entity.calendarId, savedLesson.eventId!);
       calendarApiResult =
           await CalendarClient.addEvent(event, newLesson.entity.calendarId);
     } else {

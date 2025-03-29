@@ -146,51 +146,6 @@ class FirebaseHelper {
     return lessons;
   }
 
-  static Future<List<Lesson>> getNextDaysLessons(DateTime fromDate) async {
-    CollectionReference<Map<String, dynamic>> collection =
-    db.collection(DbConstants.LESSONS);
-    int daysBefore = await getNumberOfDaysBeforeToBeVisualized();
-    Timestamp today = Timestamp.fromDate(DateTime(DateTime
-        .now()
-        .year,
-        DateTime
-            .now()
-            .month, DateTime
-            .now()
-            .day - daysBefore));
-    Timestamp oneWeekMore =
-    Timestamp.fromDate(fromDate.add(Duration(days: 7)));
-    QuerySnapshot<Map<String, dynamic>> querySnapshot = await collection
-        .where('startDate', isGreaterThan: fromDate)
-        .where("startDate", isLessThanOrEqualTo: oneWeekMore)
-        .orderBy("startDate")
-        .get();
-    List<Lesson> lessons = [];
-    for (QueryDocumentSnapshot<Map<String, dynamic>> queryDocumentSnapshot
-    in querySnapshot.docs) {
-      try {
-        Map<String, dynamic> data = queryDocumentSnapshot.data();
-        Lesson lesson = Lesson.fromMap(data)
-          ..collaborators = []
-          ..isInCalendar = data['isInCalendar']
-          ..payments = Map<String, int>.from(data['payments']);
-        lesson.addId(queryDocumentSnapshot.id);
-        lesson.addEventId(data['eventId']);
-        lesson.addLocation(await getLocationById(data['location']));
-        lesson.addEntity(await getEntityById(data['entity']));
-        lesson.collaborators = await populateCollaborators(data);
-        if (data['responsible'] != null) {
-          lesson.addResponsible(await getCollaboratorById(data['responsible']));
-        }
-        lesson.exercises = await populateExercises(data);
-        lessons.add(lesson);
-      } on Exception catch (e) {
-        print("Error: $e");
-      }
-    }
-    return lessons;
-  }
-
   static Future<List<Lesson>> getAllPastLessons() async {
     CollectionReference<Map<String, dynamic>> collection =
     db.collection(DbConstants.LESSONS);
@@ -1137,18 +1092,6 @@ class FirebaseHelper {
     });
   }
 
-  static Future<bool> getUpdateEventNotification() {
-    CollectionReference<Map<String, dynamic>> collection =
-    db.collection(DbConstants.SETTINGS);
-    return collection
-        .doc(DbConstants.UPDATE_EVENT_NOTIFICATION)
-        .get()
-        .then((DocumentSnapshot<Map<String, dynamic>> documentSnapshot) async {
-      Map<String, dynamic> data = documentSnapshot.data()!;
-      return data["value"];
-    });
-  }
-
   static Future<bool> getDeletedEventNotification() {
     CollectionReference<Map<String, dynamic>> collection =
     db.collection(DbConstants.SETTINGS);
@@ -1202,19 +1145,6 @@ class FirebaseHelper {
       db.collection(DbConstants.SETTINGS);
       await collection
           .doc(DbConstants.NEW_EVENT_NOTIFICATION)
-          .update({"value": value});
-      return Success(data: value.toString());
-    } on Exception catch (e) {
-      return Error(exception: e);
-    }
-  }
-
-  static Future<Result<String>> setUpdateEventNotification(bool value) async {
-    try {
-      CollectionReference<Map<String, dynamic>> collection =
-      db.collection(DbConstants.SETTINGS);
-      await collection
-          .doc(DbConstants.UPDATE_EVENT_NOTIFICATION)
           .update({"value": value});
       return Success(data: value.toString());
     } on Exception catch (e) {

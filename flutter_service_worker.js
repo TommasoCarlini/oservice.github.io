@@ -6,7 +6,7 @@ const CACHE_NAME = 'flutter-app-cache';
 const RESOURCES = {"assets/AssetManifest.bin": "40bfb9d5668cdd8df8a4440628650ad6",
 "assets/AssetManifest.bin.json": "3d63da198d41b74a02176ff74ac6aeca",
 "assets/AssetManifest.json": "0f0cdb818b70af93394696bcb240d3c4",
-"assets/assets/fonts/MaterialIcons-Regular.ttf": "4e85bc9ebe07e0340c9c4fc2f6c38908",
+"assets/assets/fonts/MaterialIcons-Regular.ttf": "d41d8cd98f00b204e9800998ecf8427e",
 "assets/assets/fonts/Montserrat/Montserrat-Black.ttf": "cce7ff8c1d7999f907b6760fbe75d99d",
 "assets/assets/fonts/Montserrat/Montserrat-BlackItalic.ttf": "a67f4df02f4d73bb8bfd5bff421e4d1f",
 "assets/assets/fonts/Montserrat/Montserrat-Bold.ttf": "ed86af2ed5bbaf879e9f2ec2e2eac929",
@@ -32,6 +32,7 @@ const RESOURCES = {"assets/AssetManifest.bin": "40bfb9d5668cdd8df8a4440628650ad6
 "assets/assets/images/topographic_background.jpg": "9d0e516e26767079458a90987b481e7b",
 "assets/FontManifest.json": "12e1c97d62a4a2a94931b3a485ef0a84",
 "assets/fonts/MaterialIcons-Regular.otf": "cd226c81b064c66cb796b79a61d1aaab",
+"assets/fonts/MaterialIcons-Regular.ttf": "d41d8cd98f00b204e9800998ecf8427e",
 "assets/images/topographic_background.jpg": "9d0e516e26767079458a90987b481e7b",
 "assets/images/topographic_background_orange.jpg": "f374b75fd3de7065efd07114b04da0c0",
 "assets/NOTICES": "3cfd2aac03a201449c7f7c7a42404f69",
@@ -64,7 +65,7 @@ const RESOURCES = {"assets/AssetManifest.bin": "40bfb9d5668cdd8df8a4440628650ad6
 "icons/logo.png": "48a5a9571ad4851844a5131133792788",
 "index.html": "819c3da3faf665e6ba0eba5c00a95301",
 "/": "819c3da3faf665e6ba0eba5c00a95301",
-"main.dart.js": "d40b129ac30e58a1e7db04c0ab9919bb",
+"main.dart.js": "e5291290ff07eb09acb1aea194bbef2b",
 "manifest.json": "f856618bb7f8fea405d321c65cbe6520",
 "version.json": "2656dad41434aeb42a64b446a9cdf4a6"};
 // The application shell files that are downloaded before a service worker can
