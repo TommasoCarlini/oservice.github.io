@@ -21,10 +21,11 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late FirebaseHelper firebaseHelper;
-  late List<Lesson> lessons = [];
-  late List<Lesson> incompleteLessons = [];
+  List<Lesson> lessons = [];
+  List<Lesson> incompleteLessons = [];
   bool isLoading = true;
   bool showIncompleteLessons = false;
+  DateTime fromDate = DateTime.now().add(Duration(days: 7));
 
   @override
   void initState() {
@@ -61,6 +62,25 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> _loadNextLessons() async {
+    try {
+      lessons.addAll(await FirebaseHelper.getNextDaysLessons(fromDate));
+      lessons.sort((a, b) => a.startDate.compareTo(b.startDate));
+      incompleteLessons = lessons
+          .where(
+            (element) => element.isIncomplete(),
+      )
+          .toList();
+    } catch (e) {
+      print("Errore durante il caricamento delle lezioni: $e");
+    } finally {
+      setState(() {
+        isLoading = false;
+        fromDate = fromDate.add(Duration(days: 7));
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -69,6 +89,13 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         showIncompleteLessons = value;
       });
+    }
+
+    void loadMoreLessons() async {
+      setState(() {
+        isLoading = true;
+      });
+      await _loadNextLessons();
     }
 
     if (isLoading) {
@@ -86,7 +113,7 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: const EdgeInsets.all(18.0),
         child: Column(
           children: [
-            HomeScreenHeader(width, showIncompleteLessons, showOnlyColab),
+            HomeScreenHeader(width, showIncompleteLessons, showOnlyColab, loadMoreLessons),
             Expanded(
               // Usa Expanded qui
               child: ListView.builder(

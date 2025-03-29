@@ -24,6 +24,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
   TextEditingController visualizedDaysController = TextEditingController();
   TextEditingController archiveDaysController = TextEditingController();
   bool newEventNotification = false;
+  bool updateEventNotification = false;
+  bool deleteEventNotification = false;
   List<int> eventReminders = [];
   bool isLoading = true;
 
@@ -38,19 +40,28 @@ class _NotificationScreenState extends State<NotificationScreen> {
       isLoading = true;
     });
     String payrate = await FirebaseHelper.getDefaultPayrate();
-    int visualizedDays = await FirebaseHelper.getNumberOfDaysBeforeToBeVisualized();
-    int archiveDays = await FirebaseHelper.getNumberOfDaysBeforeToBeVisualizedInArchive();
-    bool newEventNotificationDb = await FirebaseHelper.getNewEventNotification();
-    calendar.EventReminders eventRemindersDb = await FirebaseHelper.getEventReminders();
+    int visualizedDays =
+        await FirebaseHelper.getNumberOfDaysBeforeToBeVisualized();
+    int archiveDays =
+        await FirebaseHelper.getNumberOfDaysBeforeToBeVisualizedInArchive();
+    bool newEventNotificationDb =
+        await FirebaseHelper.getNewEventNotification();
+    bool updateEventNotificationDb =
+        await FirebaseHelper.getUpdateEventNotification();
+    bool deleteEventNotificationDb =
+        await FirebaseHelper.getDeletedEventNotification();
+    calendar.EventReminders eventRemindersDb =
+        await FirebaseHelper.getEventReminders();
     setState(() {
       // payrateController.text = payrate;
       visualizedDaysController.text = visualizedDays.toString();
       archiveDaysController.text = archiveDays.toString();
       newEventNotification = newEventNotificationDb;
+      updateEventNotification = updateEventNotificationDb;
+      deleteEventNotification = deleteEventNotificationDb;
       if (eventRemindersDb.overrides == null) {
         eventReminders = [];
-      }
-      else {
+      } else {
         for (calendar.EventReminder reminder in eventRemindersDb.overrides!) {
           eventReminders.add(reminder.minutes! ~/ 60);
         }
@@ -136,28 +147,27 @@ class _NotificationScreenState extends State<NotificationScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: eventReminders.map((reminder) {
         return Row(
-            children: [
-              Text(
-                reminder == 1
-                    ? "Un'ora prima dell'evento"
-                    :
-                "${reminder.toString()} ore prima dell'evento",
-                style: TextStyle(
-                  color: Theme.of(context).primaryColorLight,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
+          children: [
+            Text(
+              reminder == 1
+                  ? "Un'ora prima dell'evento"
+                  : "${reminder.toString()} ore prima dell'evento",
+              style: TextStyle(
+                color: Theme.of(context).primaryColorLight,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
               ),
-              IconButton(
-                icon: Icon(Icons.delete, color: Colors.red),
-                onPressed: () {
-                  setState(() {
-                    eventReminders.remove(reminder);
-                  });
-                },
-                tooltip: "Elimina promemoria",
-              ),
-            ],
+            ),
+            IconButton(
+              icon: Icon(Icons.delete, color: Colors.red),
+              onPressed: () {
+                setState(() {
+                  eventReminders.remove(reminder);
+                });
+              },
+              tooltip: "Elimina promemoria",
+            ),
+          ],
         );
       }).toList(),
     );
@@ -203,15 +213,30 @@ class _NotificationScreenState extends State<NotificationScreen> {
     );
   }
 
-  // Funzione di salvataggio (da completare con il salvataggio su DB)
   Future<int> updateSettings() async {
     // Result<String> res1 = await FirebaseHelper.setDefaultPayrate(payrateController.text);
-    Result<String> res2 = await FirebaseHelper.setNumberOfDaysBeforeToBeVisualized(int.parse(visualizedDaysController.text));
-    Result<String> res3 = await FirebaseHelper.setNumberOfDaysBeforeToBeVisualizedInArchive(int.parse(archiveDaysController.text));
-    Result<String> res4 = await FirebaseHelper.setNewEventNotification(newEventNotification);
-    Result<String> res5 = await FirebaseHelper.setEventReminders(eventReminders);
-    if (res2 is Error || res3 is Error || res4 is Error || res5 is Error) {
-      showErrorSnackbar(Exception("Errore durante il salvataggio delle impostazioni"));
+    Result<String> res2 =
+        await FirebaseHelper.setNumberOfDaysBeforeToBeVisualized(
+            int.parse(visualizedDaysController.text));
+    Result<String> res3 =
+        await FirebaseHelper.setNumberOfDaysBeforeToBeVisualizedInArchive(
+            int.parse(archiveDaysController.text));
+    Result<String> res4 =
+        await FirebaseHelper.setNewEventNotification(newEventNotification);
+    Result<String> res6 = await FirebaseHelper.setUpdateEventNotification(
+        updateEventNotification);
+    Result<String> res7 = await FirebaseHelper.setDeletedEventNotification(
+        deleteEventNotification);
+    Result<String> res5 =
+        await FirebaseHelper.setEventReminders(eventReminders);
+    if (res2 is Error ||
+        res3 is Error ||
+        res4 is Error ||
+        res5 is Error ||
+        res6 is Error ||
+        res7 is Error) {
+      showErrorSnackbar(
+          Exception("Errore durante il salvataggio delle impostazioni"));
       return 1;
     }
     return 0;
@@ -232,7 +257,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     if (isLoading) {
       return Center(
         child: CircularProgressIndicator(),
@@ -365,14 +389,18 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 ],
               ),
               SizedBox(height: 20),
-              // Sezione per "newEventNotification"
               Row(
                 children: [
-                  _settingHeader("Notifica nuovi eventi",
-                      "Attiva o disattiva le notifiche per i nuovi eventi"),
+                  _settingHeader("Notifica eventi",
+                      "Attiva o disattiva le notifiche per la creazione, la modifica e l'eliminazione di un evento"),
                   SizedBox(
                     width: 20,
                   ),
+                ],
+              ),
+              SizedBox(height: 8),
+              Row(
+                children: [
                   Switch(
                     value: newEventNotification,
                     activeColor: Colors.green,
@@ -386,7 +414,59 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     width: 8,
                   ),
                   Text(
-                    newEventNotification ? "Attivato" : "Disattivato",
+                    newEventNotification
+                        ? "Notifica nuovo\nevento: ATTIVA"
+                        : "Notifica nuovo\nevento: NON ATTIVA",
+                    style: TextStyle(
+                      color: Theme.of(context).primaryColorLight,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 40,
+                  ),
+                  Switch(
+                    value: updateEventNotification,
+                    activeColor: Colors.green,
+                    onChanged: (bool value) {
+                      setState(() {
+                        updateEventNotification = value;
+                      });
+                    },
+                  ),
+                  SizedBox(
+                    width: 8,
+                  ),
+                  Text(
+                    updateEventNotification
+                        ? "Notifica modifica\nevento: ATTIVA"
+                        : "Notifica modifica\nevento: NON ATTIVA",
+                    style: TextStyle(
+                      color: Theme.of(context).primaryColorLight,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 40,
+                  ),
+                  Switch(
+                    value: deleteEventNotification,
+                    activeColor: Colors.green,
+                    onChanged: (bool value) {
+                      setState(() {
+                        deleteEventNotification = value;
+                      });
+                    },
+                  ),
+                  SizedBox(
+                    width: 8,
+                  ),
+                  Text(
+                    deleteEventNotification
+                        ? "Notifica eliminazione\nevento: ATTIVA"
+                        : "Notifica eliminazione\nevento: NON ATTIVA",
                     style: TextStyle(
                       color: Theme.of(context).primaryColorLight,
                       fontSize: 16,
@@ -432,7 +512,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         backgroundColor: Colors.red.shade700,
                         surfaceTintColor: Colors.blue.shade900,
                         padding:
-                        EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                            EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
@@ -454,7 +534,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         backgroundColor: Colors.green.shade700,
                         textStyle: TextStyle(color: Colors.white),
                         padding:
-                        EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                            EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
@@ -464,11 +544,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         if (res == 0) {
                           showSuccessSnackbar();
                           widget.changeTab(Menu.IMPOSTAZIONI.index);
-                          Menu.screenRouting(
-                              Menu.IMPOSTAZIONI.index, widget.changeTab, widget.menu);
+                          Menu.screenRouting(Menu.IMPOSTAZIONI.index,
+                              widget.changeTab, widget.menu);
                         }
                       },
-                      child: Text('Salva modifiche',
+                      child: Text(
+                        'Salva modifiche',
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontFamily: 'Montserrat',
