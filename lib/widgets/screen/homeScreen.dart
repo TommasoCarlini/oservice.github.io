@@ -25,7 +25,9 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Lesson> incompleteLessons = [];
   bool isLoading = true;
   bool showIncompleteLessons = false;
-  DateTime fromDate = DateTime.now().add(Duration(days: 7));
+  DateTime fromDate = DateTime.now();
+  int stepDay = 1;
+  DateTime toDate = DateTime.now();
 
   @override
   void initState() {
@@ -33,6 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
     firebaseHelper = FirebaseHelper.initialize();
     _loadLessons();
     _initializeVariables();
+    _loadStepDay();
   }
 
   Future<void> _initializeVariables() async {
@@ -44,6 +47,15 @@ class _HomeScreenState extends State<HomeScreen> {
     await FirebaseHelper.setIsEntitySaved(false);
   }
 
+  Future<void> _loadStepDay() async {
+    try {
+      stepDay = await FirebaseHelper.getStepDay();
+      toDate = DateTime.now().add(Duration(days: stepDay));
+    } catch (e) {
+      print("Errore durante il caricamento del passo giorno: $e");
+    }
+  }
+
   Future<void> _loadLessons() async {
     try {
       lessons = await FirebaseHelper.getAllLessons();
@@ -51,32 +63,13 @@ class _HomeScreenState extends State<HomeScreen> {
       incompleteLessons = lessons
           .where(
             (element) => element.isIncomplete(),
-      )
+          )
           .toList();
     } catch (e) {
       print("Errore durante il caricamento delle lezioni: $e");
     } finally {
       setState(() {
         isLoading = false;
-      });
-    }
-  }
-
-  Future<void> _loadNextLessons() async {
-    try {
-      lessons.addAll(await FirebaseHelper.getNextDaysLessons(fromDate));
-      lessons.sort((a, b) => a.startDate.compareTo(b.startDate));
-      incompleteLessons = lessons
-          .where(
-            (element) => element.isIncomplete(),
-      )
-          .toList();
-    } catch (e) {
-      print("Errore durante il caricamento delle lezioni: $e");
-    } finally {
-      setState(() {
-        isLoading = false;
-        fromDate = fromDate.add(Duration(days: 7));
       });
     }
   }
@@ -91,11 +84,92 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     }
 
-    void loadMoreLessons() async {
+    Future<void> loadNextLessons() async {
       setState(() {
         isLoading = true;
       });
-      await _loadNextLessons();
+      try {
+        lessons.addAll(await FirebaseHelper.getNextDaysLessons(toDate));
+        lessons.sort((a, b) => a.startDate.compareTo(b.startDate));
+        incompleteLessons = lessons
+            .where(
+              (element) => element.isIncomplete(),
+        )
+            .toList();
+      } catch (e) {
+        print("Errore durante il caricamento delle lezioni: $e");
+      } finally {
+        setState(() {
+          toDate = toDate.add(Duration(days: stepDay));
+          isLoading = false;
+        });
+      }
+    }
+
+    Future<void> loadLessonsBetweenDates(
+        DateTime fromDate, DateTime toDate) async {
+      setState(() {
+        isLoading = true;
+        this.fromDate = fromDate;
+        this.toDate = toDate;
+      });
+      try {
+        lessons = await FirebaseHelper.getLessonsBetweenDates(
+            fromDate, toDate.add(Duration(hours: 23)));
+        lessons.sort((a, b) => a.startDate.compareTo(b.startDate));
+        incompleteLessons = lessons
+            .where(
+              (element) => element.isIncomplete(),
+            )
+            .toList();
+      } catch (e) {
+        print("Errore durante il caricamento delle lezioni: $e");
+      } finally {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+
+    void dateRangePicker() async {
+      DateTimeRange? pickedDateRange = await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Theme(
+            data: ThemeData.light().copyWith(
+              colorScheme: ColorScheme.light(
+                primary: Colors.deepOrangeAccent,
+                onSurface: Colors.black87,
+                onPrimary: Colors.black87,
+              ),
+              textSelectionTheme: TextSelectionThemeData(
+                cursorColor: Colors.deepOrangeAccent,
+                selectionColor: Colors.deepOrangeAccent,
+                selectionHandleColor: Colors.deepOrangeAccent,
+              ),
+            ),
+            child: Dialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: SizedBox(
+                  height: 600.0,
+                  width: 400.0,
+                  child: DateRangePickerDialog(
+                      firstDate: DateTime(DateTime.now().year),
+                      lastDate: DateTime(DateTime.now().year + 2)),
+                )),
+          );
+        },
+      );
+      if (pickedDateRange != null) {
+        setState(() {
+          fromDate = pickedDateRange.start;
+          toDate = pickedDateRange.end;
+          loadLessonsBetweenDates(fromDate, toDate);
+        });
+      }
+      return;
     }
 
     if (isLoading) {
@@ -113,7 +187,8 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: const EdgeInsets.all(18.0),
         child: Column(
           children: [
-            HomeScreenHeader(width, showIncompleteLessons, showOnlyColab, loadMoreLessons),
+            HomeScreenHeader(width, showIncompleteLessons, showOnlyColab,
+                fromDate, toDate, loadNextLessons, dateRangePicker, stepDay.toString()),
             Expanded(
               // Usa Expanded qui
               child: ListView.builder(

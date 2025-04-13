@@ -1,8 +1,18 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-PreferredSizeWidget HomeScreenHeader(double width, bool isColabComplete,
-    Function showOnlyColab, Function loadMoreLessons) {
+PreferredSizeWidget HomeScreenHeader(
+    double width,
+    bool isColabComplete,
+    Function showOnlyColab,
+    DateTime fromDate,
+    DateTime toDate,
+    Function loadNextLessons,
+    Function dateRangePicker,
+    String stepDay,) {
+  String getFormattedDate(DateTime date) {
+    return "${date.day}/${date.month}/${date.year}";
+  }
+
   return AppBar(
       backgroundColor: Colors.transparent,
       surfaceTintColor: Colors.transparent,
@@ -18,9 +28,11 @@ PreferredSizeWidget HomeScreenHeader(double width, bool isColabComplete,
           SizedBox(
               width: 250,
               child: TextButton(
-                  onPressed: () => loadMoreLessons(),
+                  onPressed: () => loadNextLessons(),
                   child: Text(
-                    "Carica altri 7 giorni",
+                    stepDay == "1" ?
+                        "Carica un altro giorno"
+                        : "Carica altri $stepDay giorni",
                     style: TextStyle(
                       decoration: TextDecoration.underline,
                       fontWeight: FontWeight.bold,
@@ -32,27 +44,20 @@ PreferredSizeWidget HomeScreenHeader(double width, bool isColabComplete,
             width: 20,
           ),
           Expanded(
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: 'Cerca',
-                hintStyle: TextStyle(color: Colors.indigo),
-                prefixIcon: Icon(Icons.search, color: Colors.indigo),
-                border: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.indigo),
-                  borderRadius: BorderRadius.circular(25.0),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.indigo),
-                  borderRadius: BorderRadius.circular(25.0),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.indigo),
-                  borderRadius: BorderRadius.circular(25.0),
-                ),
-              ),
-            ),
+              child: TextButton(
+                  onPressed: () => dateRangePicker(),
+                  child: Text(
+                    "${getFormattedDate(fromDate)} - ${getFormattedDate(toDate)}",
+                    style: TextStyle(
+                      decoration: TextDecoration.underline,
+                      fontWeight: FontWeight.bold,
+                      fontStyle: FontStyle.italic,
+                      fontSize: 18,
+                    ),
+                  ))),
+          SizedBox(
+            width: 20,
           ),
-          // button for filter
           SizedBox(
             width: 20,
           ),
