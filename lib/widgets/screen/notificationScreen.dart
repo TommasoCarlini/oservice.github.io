@@ -20,12 +20,6 @@ class NotificationScreen extends StatefulWidget {
 }
 
 class _NotificationScreenState extends State<NotificationScreen> {
-  // TextEditingController payrateController = TextEditingController();
-  TextEditingController visualizedDaysController = TextEditingController();
-  TextEditingController archiveDaysController = TextEditingController();
-  bool newEventNotification = false;
-  bool updateEventNotification = false;
-  bool deleteEventNotification = false;
   List<int> eventReminders = [];
   bool isLoading = true;
 
@@ -39,26 +33,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
     setState(() {
       isLoading = true;
     });
-    String payrate = await FirebaseHelper.getDefaultPayrate();
-    int visualizedDays =
-    await FirebaseHelper.getNumberOfDaysBeforeToBeVisualized();
-    int archiveDays =
-    await FirebaseHelper.getNumberOfDaysBeforeToBeVisualizedInArchive();
-    bool newEventNotificationDb =
-    await FirebaseHelper.getNewEventNotification();
-    bool updateEventNotificationDb =
-    await FirebaseHelper.getUpdateEventNotification();
-    bool deleteEventNotificationDb =
-    await FirebaseHelper.getDeletedEventNotification();
     calendar.EventReminders eventRemindersDb =
-    await FirebaseHelper.getEventReminders();
+        await FirebaseHelper.getEventReminders();
     setState(() {
-      // payrateController.text = payrate;
-      visualizedDaysController.text = visualizedDays.toString();
-      archiveDaysController.text = archiveDays.toString();
-      newEventNotification = newEventNotificationDb;
-      updateEventNotification = updateEventNotificationDb;
-      deleteEventNotification = deleteEventNotificationDb;
       if (eventRemindersDb.overrides == null) {
         eventReminders = [];
       } else {
@@ -72,13 +49,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
   @override
   void dispose() {
-    // payrateController.dispose();
-    visualizedDaysController.dispose();
-    archiveDaysController.dispose();
     super.dispose();
   }
 
-  // Widget per mostrare un titolo e una descrizione
   Widget _settingHeader(String title, String description) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -103,7 +76,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
     );
   }
 
-  // Funzione per aggiungere un nuovo reminder
   Future<void> _addEventReminder() async {
     int? newReminder = await showDialog<int>(
       context: context,
@@ -141,7 +113,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
     }
   }
 
-  // Widget per mostrare la lista dei promemoria con possibilità di eliminare
   Widget _buildEventReminders() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -214,29 +185,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
   }
 
   Future<int> updateSettings() async {
-    // Result<String> res1 = await FirebaseHelper.setDefaultPayrate(payrateController.text);
-    Result<String> res2 =
-    await FirebaseHelper.setNumberOfDaysBeforeToBeVisualized(
-        int.parse(visualizedDaysController.text));
-    Result<String> res3 =
-    await FirebaseHelper.setNumberOfDaysBeforeToBeVisualizedInArchive(
-        int.parse(archiveDaysController.text));
-    Result<String> res4 =
-    await FirebaseHelper.setNewEventNotification(newEventNotification);
-    Result<String> res6 = await FirebaseHelper.setUpdateEventNotification(
-        updateEventNotification);
-    Result<String> res7 = await FirebaseHelper.setDeletedEventNotification(
-        deleteEventNotification);
-    Result<String> res5 =
-    await FirebaseHelper.setEventReminders(eventReminders);
-    if (res2 is Error ||
-        res3 is Error ||
-        res4 is Error ||
-        res5 is Error ||
-        res6 is Error ||
-        res7 is Error) {
+    Result<String> result =
+        await FirebaseHelper.setEventReminders(eventReminders);
+    if (result is Error) {
       showErrorSnackbar(
-          Exception("Errore durante il salvataggio delle impostazioni"));
+          Exception("Errore durante il salvataggio delle notifiche"));
       return 1;
     }
     return 0;
@@ -248,7 +201,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
         backgroundColor: Colors.transparent,
         content: AwesomeSnackbarContent(
           title: 'Fatto!',
-          message: 'Impostazioni salvate con successo',
+          message: 'Notifiche salvate con successo',
           contentType: ContentType.success,
         ),
       ),
@@ -276,7 +229,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             children: [
               Center(
                 child: Text(
-                  'Impostazioni',
+                  'Notifiche',
                   style: TextStyle(
                     color: Colors.indigo,
                     fontSize: 24,
@@ -285,177 +238,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 ),
               ),
               SizedBox(height: 40),
-              // Sezione per "payrate"
-              // Row(
-              //   children: [
-              //     _settingHeader(
-              //         "Payrate", "Imposta il valore della paga (in €/h)"),
-              //     SizedBox(width: 20),
-              //     SizedBox(
-              //       width: 55,
-              //       child: TextFormField(
-              //         style: TextStyle(
-              //           color: Theme.of(context).primaryColorLight,
-              //           fontSize: 16,
-              //           fontWeight: FontWeight.bold,
-              //         ),
-              //         controller: payrateController,
-              //         keyboardType: TextInputType.number,
-              //         decoration: InputDecoration(
-              //           suffix: Text(
-              //             "€/h",
-              //             style: TextStyle(
-              //               color: Theme.of(context).primaryColorLight,
-              //               fontSize: 16,
-              //               fontWeight: FontWeight.bold,
-              //             ),
-              //           ),
-              //           border: UnderlineInputBorder(),
-              //         ),
-              //       ),
-              //     ),
-              //   ],
-              // ),
-              // SizedBox(height: 20),
-              // Sezione per "numberOfDaysBeforeToBeVisualized"
-              Row(
-                children: [
-                  _settingHeader("Giorni per visualizzazione",
-                      "Imposta il numero di giorni dopo il quale non visualizzi più l'evento (visualizzazione classica e in archvio)"),
-                  SizedBox(width: 40),
-                  SizedBox(
-                    width: 190,
-                    child: TextFormField(
-                      style: TextStyle(
-                        color: Theme.of(context).primaryColorLight,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      controller: visualizedDaysController,
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                        prefix: Text(
-                          "Nella home:  ",
-                          style: TextStyle(
-                            color: Theme.of(context).primaryColorLight,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        suffix: Text(
-                          " giorni",
-                          style: TextStyle(
-                            color: Theme.of(context).primaryColorLight,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        border: UnderlineInputBorder(),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 40),
-                  SizedBox(
-                    width: 190,
-                    child: TextFormField(
-                      style: TextStyle(
-                        color: Theme.of(context).primaryColorLight,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      controller: archiveDaysController,
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                        prefix: Text(
-                          "In archivio:  ",
-                          style: TextStyle(
-                            color: Theme.of(context).primaryColorLight,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        suffix: Text(
-                          " giorni",
-                          style: TextStyle(
-                            color: Theme.of(context).primaryColorLight,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        border: UnderlineInputBorder(),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 20),
-              Row(
-                children: [
-                  _settingHeader("Notifica eventi",
-                      "Attiva o disattiva le notifiche per la creazione e l'eliminazione di un evento"),
-                  SizedBox(
-                    width: 20,
-                  ),
-                ],
-              ),
-              SizedBox(height: 8),
-              Row(
-                children: [
-                  Switch(
-                    value: newEventNotification,
-                    activeColor: Colors.green,
-                    onChanged: (bool value) {
-                      setState(() {
-                        newEventNotification = value;
-                      });
-                    },
-                  ),
-                  SizedBox(
-                    width: 8,
-                  ),
-                  Text(
-                    newEventNotification
-                        ? "Notifica nuovo\nevento: ATTIVA"
-                        : "Notifica nuovo\nevento: NON ATTIVA",
-                    style: TextStyle(
-                      color: Theme.of(context).primaryColorLight,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(
-                    width: 40,
-                  ),
-                  Switch(
-                    value: deleteEventNotification,
-                    activeColor: Colors.green,
-                    onChanged: (bool value) {
-                      setState(() {
-                        deleteEventNotification = value;
-                      });
-                    },
-                  ),
-                  SizedBox(
-                    width: 8,
-                  ),
-                  Text(
-                    deleteEventNotification
-                        ? "Notifica eliminazione\nevento: ATTIVA"
-                        : "Notifica eliminazione\nevento: NON ATTIVA",
-                    style: TextStyle(
-                      color: Theme.of(context).primaryColorLight,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-
-              SizedBox(height: 20),
-              // Sezione per "eventReminders"
               _settingHeader("Promemoria evento",
-                  "Aggiungi o elimina i promemoria evento. Non modificabili direttamente."),
-              SizedBox(height: 8),
+                  "Aggiungi o elimina i promemoria evento. I promemoria non sono modificabili."),
+              SizedBox(height: 20),
               _buildEventReminders(),
               SizedBox(height: 8),
               ElevatedButton(
@@ -487,7 +272,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         backgroundColor: Colors.red.shade700,
                         surfaceTintColor: Colors.blue.shade900,
                         padding:
-                        EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                            EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
@@ -509,7 +294,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         backgroundColor: Colors.green.shade700,
                         textStyle: TextStyle(color: Colors.white),
                         padding:
-                        EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                            EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),

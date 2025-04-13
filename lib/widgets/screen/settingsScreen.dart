@@ -90,19 +90,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     children: [
                       SquaredButton(
                         onPressed: () {
+                          widget.changeTab(Menu.SETTINGS.index);
+                          Menu.screenRouting(Menu.SETTINGS.index,
+                              widget.changeTab, widget.menu);
+                        },
+                        icon: Icons.settings,
+                        text: "Impostazioni",
+                      ),
+                      SquaredButton(
+                        onPressed: () {
                           widget.changeTab(Menu.NOTIFICATIONS.index);
                           Menu.screenRouting(Menu.NOTIFICATIONS.index,
                               widget.changeTab, widget.menu);
                         },
                         icon: Icons.notifications_active_rounded,
                         text: "Notifiche",
-                      ),
-                      SquaredButton(
-                        onPressed: () {
-                          _launchUrl();
-                        },
-                        icon: Icons.calendar_month_rounded,
-                        text: "Calendario",
                       ),
                     ],
                   ),

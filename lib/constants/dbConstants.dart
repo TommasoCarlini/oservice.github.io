@@ -35,4 +35,5 @@ class DbConstants {
   static const String DELETED_EVENT_NOTIFICATION = 'deletedEventNotification';
   static const String EVENT_REMINDERS = 'eventReminders';
   static const String PAYRATE_DEFAULT = 'payrate';
+  static const String STEP_DAY   = 'stepDay';
 }

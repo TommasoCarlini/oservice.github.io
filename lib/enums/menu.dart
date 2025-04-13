@@ -14,6 +14,7 @@ import 'package:oservice/widgets/screen/locationScreen.dart';
 import 'package:oservice/widgets/screen/notificationScreen.dart';
 import 'package:oservice/widgets/screen/paymentsScreen.dart';
 import 'package:oservice/widgets/screen/registrationScreen.dart';
+import 'package:oservice/widgets/screen/settingsDetailScreen.dart';
 import 'package:oservice/widgets/screen/settingsScreen.dart';
 import 'package:oservice/widgets/screen/unpaidScreen.dart';
 
@@ -42,6 +43,7 @@ class Menu {
   static const Menu PAYMENTS = Menu._('Pagamenti', 14);
   static const Menu NOTIFICATIONS = Menu._('Notifiche', 15);
   static const Menu TAX_INFO = Menu._('Fatturazione', 16);
+  static const Menu SETTINGS = Menu._('Impostazioni', 17);
 
   static Menu fromIndex(int index) {
     switch (index) {
@@ -79,6 +81,8 @@ class Menu {
         return NOTIFICATIONS;
       case 16:
         return TAX_INFO;
+      case 17:
+        return SETTINGS;
       default:
         return HOME;
     }
@@ -166,6 +170,11 @@ class Menu {
         );
       case 16:
         return AddTaxInfoScreen(
+          changeTab: changeTab,
+          menu: tabController,
+        );
+      case 17:
+        return SettingsDetailScreen(
           changeTab: changeTab,
           menu: tabController,
         );
