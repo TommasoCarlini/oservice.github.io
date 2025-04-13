@@ -48,8 +48,10 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
   Future<void> _fetchExercises() async {
     try {
       List<Exercise> exercises = await FirebaseHelper.getAllExercises();
+      exercises.sort((a, b) => a.title.compareTo(b.title));
       setState(() {
         exercisesList = exercises;
+        exercisesList.sort((a, b) => a.title.compareTo(b.title));
       });
     } catch (e) {
       showErrorSnackbar(
