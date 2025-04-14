@@ -382,7 +382,7 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
           .where((element) => element.name == collaborator.name)
           .length;
       await PdfHelper.generateCollaboratorPDF(
-          taxInfo, amount, numberOfPayments, paymentDate);
+          taxInfo, amount, numberOfPayments, paymentDate, selectedMonth.name);
     }
   }
 

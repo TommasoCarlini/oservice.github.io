@@ -13,7 +13,7 @@ import 'package:printing/printing.dart';
 
 class PdfHelper {
   static Future<void> generateCollaboratorPDF(TaxInfo taxInfo, int grossAmount,
-      int numberOfPayments, DateTime paymentDate) async {
+      int numberOfPayments, DateTime paymentDate, String workingPeriod) async {
     final fontData =
         await rootBundle.load("assets/fonts/Montserrat/Montserrat-Regular.ttf");
     final ttf = pw.Font.ttf(fontData.buffer.asByteData());
@@ -32,19 +32,17 @@ class PdfHelper {
         fontWeight: pw.FontWeight.bold,
         fontSize: 14);
 
-    // Calcola ritenuta e netto
     final double tax = grossAmount * 0.20;
     final double net = grossAmount - tax;
 
-    // Date fisse per l'esempio
-    final String day = DateTime.now().day.toString();
-    final String month = Month.fromNumber(DateTime.now().month).name;
-    final String year = DateTime.now().year.toString();
-    String currentDate = "$day $month $year";
     String paymentDateString =
         "${paymentDate.day} ${Month.fromNumber(paymentDate.month).name} ${paymentDate.year}";
 
-    final String periodDate = "$month $year";
+    String year = paymentDate.year.toString();
+    if (Month.fromName(workingPeriod).number > paymentDate.month) {;
+      year = (paymentDate.year - 1).toString();
+    }
+    final String periodDate = "$workingPeriod $year";
 
     String extractDate(String date) {
       List<String> dateParts = date.split("/");
@@ -157,7 +155,7 @@ class PdfHelper {
               pw.Row(
                 mainAxisAlignment: pw.MainAxisAlignment.start,
                 children: [
-                  pw.Text("dichiara di ricevere la somma lorda di ",
+                  pw.Text("dichiara di ricevere la somma lorda di euro ",
                       style: defaultTextStyle),
                   pw.Text(grossAmount.toStringAsFixed(2), style: boldTextStyle),
                   pw.Text(
